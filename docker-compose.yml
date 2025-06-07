@@ -1,0 +1,30 @@
+services:
+
+  cache:
+    container_name: redis
+    image: redis:alpine
+    ports:
+      - 6379:6379
+    volumes:
+      - redis_data:/data
+    networks:
+      - matddang-be-network
+
+  application:
+    container_name: matddang_be
+    image: matddang_be
+    ports:
+      - 8080:8080
+    depends_on:
+      - cache
+    env_file:
+      - .env
+    networks:
+      - matddang-be-network
+
+volumes:
+    redis_data:
+
+networks:
+  matddang-be-network:
+    driver: bridge
