@@ -21,8 +21,6 @@ import static shop.matddang.matddangbe.user.domain.Role.USER;
 @Table(name = "`user`")
 @NoArgsConstructor(access = PROTECTED)
 @Getter
-@SQLDelete(sql = "UPDATE `user` SET deleted_at = NOW() WHERE id = ?")
-@SQLRestriction("deleted_at IS NULL")
 public class UserEntity extends BaseTimeEntityWithDeletion {
 
     @Id @GeneratedValue(strategy = IDENTITY)
