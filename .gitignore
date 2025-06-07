@@ -38,3 +38,5 @@ out/
 
 application-jwt.yml
 application-oauth.yml
+
+.env
