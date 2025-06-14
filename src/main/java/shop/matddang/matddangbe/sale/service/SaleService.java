@@ -3,7 +3,7 @@ package shop.matddang.matddangbe.sale.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import shop.matddang.matddangbe.sale.domain.Sale;
-import shop.matddang.matddangbe.sale.domain.SuitableCrops;
+import shop.matddang.matddangbe.suitableCrops.domain.SuitableCrops;
 import shop.matddang.matddangbe.sale.dto.SaleRequestDto;
 import shop.matddang.matddangbe.sale.repository.SaleRepository;
 import shop.matddang.matddangbe.sale.repository.SuitableCropsRepository;
@@ -17,6 +17,10 @@ public class SaleService {
 
     private final SaleRepository saleRepository;
     private final SuitableCropsRepository suitableCropsRepository;  // 생성자 주입으로 변경
+
+    public List<Sale> findBySaleId(Long saleId) {
+        return saleRepository.findBySaleId(saleId);
+    }
 
     public List<Sale> findAllById(Iterable<Long> saleIdList) {
         return saleRepository.findAllById(saleIdList);

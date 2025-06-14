@@ -1,4 +1,4 @@
-package shop.matddang.matddangbe.sale.domain;
+package shop.matddang.matddangbe.suitableCrops.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -13,10 +13,10 @@ public class SuitableCrops {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="sale_id")
-    private Long saleId;
-
     @Column(name="crop_id")
     private Long cropId;
+
+    @Column(name="sale_id")
+    private Long saleId;
 
 }

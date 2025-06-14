@@ -1,4 +1,4 @@
-package shop.matddang.matddangbe.sale.domain;
+package shop.matddang.matddangbe.crop.domain;
 
 
 import jakarta.persistence.*;
@@ -28,10 +28,10 @@ public class Crop {
         private Double harvestAmount;
 
         @Column(name = "production_income")
-        private Integer productionIncome;
+        private Double productionIncome;
 
         @Column(name = "production_cost")
-        private Integer productionCost;
+        private Double productionCost;
 
         @Column(name = "profit")
         private Double profit;

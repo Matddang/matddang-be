@@ -27,4 +27,5 @@ public interface SaleRepository extends JpaRepository<Sale,Long> {
                 @Param("landCategoryList") List<String>landCategoryList
         );
 
-    }
+    List<Sale> findBySaleId(Long saleId);
+}
