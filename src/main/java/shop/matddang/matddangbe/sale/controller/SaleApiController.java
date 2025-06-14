@@ -35,24 +35,24 @@ public class SaleApiController {
     @PostMapping
     public ResponseEntity<CommonResponse<List<Sale>>> getSales(@RequestBody SaleRequestDto requestDto) {
 
-        List<Sale> baseFilteredSales = saleService.searchSales(requestDto); //거래유형, 가격, 면적, 토지유형 필터링 완료
 
-        List<Long> saleIds = baseFilteredSales.stream()
-                .map(Sale::getSaleId)
-                .collect(Collectors.toList());
+        List<Sale> saleList = saleService.searchSales(requestDto); //거래유형, 가격, 면적, 토지유형 필터링 완료
 
-        List<Sale> lastSaleList = saleService.findAllById(saleIds);
-
+        // 농작물 필터링
         if (!requestDto.getCropIds().isEmpty()) {
-            // 농작물 필터링
+
+            List<Long> saleIds = saleList.stream()
+                    .map(Sale::getSaleId)
+                    .collect(Collectors.toList());
+
+            List<SuitableCrops> saleFilterList = saleService.findBySaleIdInAndCropIdIn(saleIds, requestDto.getCropIds());
 
             Set<Long> saleIdSet = new HashSet<>();
-            List<SuitableCrops> saleList = saleService.findBySaleIdInAndCropIdIn(saleIds, requestDto.getCropIds());
-            List<SuitableCrops> uniqueSaleList = saleList.stream()
+            List<SuitableCrops> uniqueSaleList = saleFilterList.stream()
                     .filter(s -> saleIdSet.add(s.getSaleId()))  // 중복 제거
                     .collect(Collectors.toList());
 
-            lastSaleList = saleService.findAllById(saleIdSet);
+            saleList = saleService.findAllById(saleIdSet);
 
         }
 
@@ -60,7 +60,7 @@ public class SaleApiController {
                 CommonResponse.<List<Sale>>builder()
                         .status(HttpStatus.OK.value())
                         .message("매물 조회 성공")
-                        .data(lastSaleList)
+                        .data(saleList)
                         .build()
         );
 

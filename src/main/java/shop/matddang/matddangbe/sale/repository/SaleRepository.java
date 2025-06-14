@@ -14,20 +14,17 @@ public interface SaleRepository extends JpaRepository<Sale,Long> {
 
 
         @Query("SELECT s FROM Sale s " +
-                "WHERE (( s.saleCategory = :buy ) OR ( s.saleCategory = :rent )) " +
+                "WHERE ( s.saleCategory IN (:saleCategoryList)) " +
                 "AND ((s.price >= :minPrice ) AND ( s.price <= :maxPrice)) " +
                 "AND ((s.area >= :minArea ) AND (s.area <= :maxArea))" +
-                "AND ((s.landCategory = :landCategory_d ) OR ( s.landCategory = :landCategory_j ) OR ( s.landCategory = :landCategory_g))")
+                "AND ((s.landCategory IN (:landCategoryList)))")
         List<Sale> searchBySaleFilter(
-                @Param("buy") String buy,
-                @Param("rent") String rent,
+                @Param("saleCategoryList") List<String> saleCategoryList,
                 @Param("minPrice") BigDecimal minPrice,
                 @Param("maxPrice") BigDecimal maxPrice,
                 @Param("minArea") BigDecimal minArea,
                 @Param("maxArea") BigDecimal maxArea,
-                @Param("landCategory_d") String landCategory_d,
-                @Param("landCategory_j") String landCategory_j,
-                @Param("landCategory_g") String landCategory_g
+                @Param("landCategoryList") List<String>landCategoryList
         );
 
     }

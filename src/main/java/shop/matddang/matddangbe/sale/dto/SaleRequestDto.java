@@ -15,8 +15,7 @@ import java.util.List;
 @Builder
 public class SaleRequestDto {
 
-    private String buy;
-    private String rent;
+    private List<String> saleCategoryList; // [임대, 매매]
 
     private BigDecimal minPrice; // 최소 가격
     private BigDecimal maxPrice; // 최대 가격
@@ -24,10 +23,7 @@ public class SaleRequestDto {
     private BigDecimal minArea; // 최소 면적
     private BigDecimal maxArea; // 최대 면적
 
-    private String landCategory_d; // 답
-    private String landCategory_j; // 전
-    private String landCategory_g; // 과수원
-
-    private List<Long> cropIds;
+    private List<String> landCategoryList; // [전_전, 답_답, 과수원]
+    private List<Long> cropIds; //[1,2,3,4]
 
 }
