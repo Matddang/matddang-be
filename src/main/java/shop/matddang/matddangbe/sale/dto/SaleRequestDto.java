@@ -28,10 +28,6 @@ public class SaleRequestDto {
     private String landCategory_j; // 전
     private String landCategory_g; // 과수원
 
-    private Long crop1;
-    private Long crop2;
-    private Long crop3;
-    private Long crop4;
-
+    private List<Long> cropIds;
 
 }

@@ -10,13 +10,18 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import shop.matddang.matddangbe.global.dto.CommonResponse;
+import shop.matddang.matddangbe.sale.domain.Crop;
 import shop.matddang.matddangbe.sale.domain.Sale;
+import shop.matddang.matddangbe.sale.domain.SuitableCrops;
 import shop.matddang.matddangbe.sale.dto.SaleRequestDto;
 import shop.matddang.matddangbe.sale.service.SaleService;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-@Tag(name="sale", description = "매물 로드")
+@Tag(name = "sale", description = "매물 로드")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/sale")
@@ -24,28 +29,38 @@ public class SaleApiController {
 
     private final SaleService saleService;
 
-
     //매물 조회 & 검색
     @Operation(summary = "매물 조회 & 검색",
             description = "매물 조회 & 검색 & 필터링")
     @PostMapping
     public ResponseEntity<CommonResponse<List<Sale>>> getSales(@RequestBody SaleRequestDto requestDto) {
 
-        List<Sale> saleList = saleService.searchSales(requestDto);
+        List<Sale> baseFilteredSales = saleService.searchSales(requestDto); //거래유형, 가격, 면적, 토지유형 필터링 완료
 
-        //TODO
-        /**
-         * 적합 농산물을 빼고 필터링 진행,
-         * 그 결과의 매물과 적합한 농산물 매칭하는 table 하나 만들고
-         * 포함되는 것 중복 제거해서 매물 리스트 가져옴
-         * 그리고 sales에 findbyid로 리스트 추출.
-         */
+        List<Long> saleIds = baseFilteredSales.stream()
+                .map(Sale::getSaleId)
+                .collect(Collectors.toList());
+
+        List<Sale> lastSaleList = saleService.findAllById(saleIds);
+
+        if (!requestDto.getCropIds().isEmpty()) {
+            // 농작물 필터링
+
+            Set<Long> saleIdSet = new HashSet<>();
+            List<SuitableCrops> saleList = saleService.findBySaleIdInAndCropIdIn(saleIds, requestDto.getCropIds());
+            List<SuitableCrops> uniqueSaleList = saleList.stream()
+                    .filter(s -> saleIdSet.add(s.getSaleId()))  // 중복 제거
+                    .collect(Collectors.toList());
+
+            lastSaleList = saleService.findAllById(saleIdSet);
+
+        }
 
         return ResponseEntity.ok(
                 CommonResponse.<List<Sale>>builder()
                         .status(HttpStatus.OK.value())
                         .message("매물 조회 성공")
-                        .data(saleList)
+                        .data(lastSaleList)
                         .build()
         );
 

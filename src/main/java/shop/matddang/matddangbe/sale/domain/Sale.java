@@ -19,39 +19,40 @@ public class Sale{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="sale_id")
-    private Long sale_id;
+    private Long saleId;
 
     @Column(name = "sale_category")
-    private String sale_category;
+    private String saleCategory;
 
     @Column(name = "land_type")
-    private String land_type;
+    private String landType;
 
     @Column(name = "sale_addr")
-    private String sale_addr;
+    private String saleAddr;
 
     @Column(name = "wgs_x")
-    private Long wgs_x;
+    private Long wgsX;
 
     @Column(name = "wgs_y")
-    private Long wgs_y;
+    private Long wgsY;
 
     @Column(name = "bcd_code")
-    private String bcd_code;
+    private String bcdCode;
 
     @Column(name = "land_category")
-    private String land_category;
+    private String landCategory;
 
     @Column(name = "price")
     private BigDecimal price;
 
     @Column(name = "official_price")
-    private BigDecimal official_price;
+    private BigDecimal officialPrice;
 
     @Column(name = "reg_date")
-    private LocalDateTime reg_date;
+    private LocalDateTime regDate;
 
     @Column(name = "area")
     private BigDecimal area;
+
 
 }

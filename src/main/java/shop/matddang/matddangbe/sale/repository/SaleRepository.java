@@ -12,11 +12,12 @@ import java.util.List;
 @Repository
 public interface SaleRepository extends JpaRepository<Sale,Long> {
 
+
         @Query("SELECT s FROM Sale s " +
-                "WHERE (( s.sale_category = :buy ) OR ( s.sale_category = :rent )) " +
+                "WHERE (( s.saleCategory = :buy ) OR ( s.saleCategory = :rent )) " +
                 "AND ((s.price >= :minPrice ) AND ( s.price <= :maxPrice)) " +
                 "AND ((s.area >= :minArea ) AND (s.area <= :maxArea))" +
-                "AND ((s.land_category = :landCategory_d ) OR ( s.land_category = :landCategory_j ) OR ( s.land_category = :landCategory_g))")
+                "AND ((s.landCategory = :landCategory_d ) OR ( s.landCategory = :landCategory_j ) OR ( s.landCategory = :landCategory_g))")
         List<Sale> searchBySaleFilter(
                 @Param("buy") String buy,
                 @Param("rent") String rent,
