@@ -7,7 +7,7 @@ import shop.matddang.matddangbe.user.dto.response.SocialLoginResponse;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-06-14T04:10:55+0900",
+    date = "2025-06-14T20:34:29+0900",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.13 (Oracle Corporation)"
 )
 @Component

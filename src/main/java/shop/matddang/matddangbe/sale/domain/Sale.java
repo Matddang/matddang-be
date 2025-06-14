@@ -2,7 +2,6 @@ package shop.matddang.matddangbe.sale.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
-import shop.matddang.matddangbe.global.domain.BaseTimeEntity;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -31,13 +30,10 @@ public class Sale{
     private String saleAddr;
 
     @Column(name = "wgs_x")
-    private Long wgsX;
+    private Double wgsX;
 
     @Column(name = "wgs_y")
-    private Long wgsY;
-
-    @Column(name = "bcd_code")
-    private String bcdCode;
+    private Double wgsY;
 
     @Column(name = "land_category")
     private String landCategory;

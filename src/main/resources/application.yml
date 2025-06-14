@@ -1,6 +1,6 @@
 spring:
   profiles:
-    include: local, jwt
+    include: local, jwt, apikey
 
   datasource:
     url: jdbc:mysql://${MYSQL_HOST}:${MYSQL_PORT}/${MYSQL_DATABASE}?serverTimezone=Asia/Seoul&characterEncoding=UTF-8&useSSL=false&allowPublicKeyRetrieval=true
@@ -64,3 +64,9 @@ jwt:
     access: ${ACCESS_EXPIRATION}
     refresh: ${REFRESH_EXPIRATION}
   secret: ${JWT_SECRET}
+
+external:
+  api:
+    vworld:
+      url: https://api.vworld.kr/req/address
+      key: ${GEO_API_KEY}

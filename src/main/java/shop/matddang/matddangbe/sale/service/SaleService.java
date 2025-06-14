@@ -72,4 +72,9 @@ public class SaleService {
         return suitableCropsRepository.findBySaleIdInAndCropIdIn(saleIds, cropIds);
     }
 
+    // Sale 저장
+    public Sale save(Sale sale) {
+        return saleRepository.save(sale);
+    }
+
 }

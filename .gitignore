@@ -40,3 +40,4 @@ application-jwt.yml
 application-oauth.yml
 
 .env
+/src/main/resources/application-apikey.yml
