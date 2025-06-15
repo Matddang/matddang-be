@@ -6,18 +6,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import shop.matddang.matddangbe.crop.domain.Crop;
-import shop.matddang.matddangbe.crop.service.CropService;
-import shop.matddang.matddangbe.global.dto.CommonResponse;
 import shop.matddang.matddangbe.sale.domain.Sale;
 import shop.matddang.matddangbe.suitableCrops.dto.SuitableCropsResponseDto;
 import shop.matddang.matddangbe.suitableCrops.domain.SuitableCrops;
 import shop.matddang.matddangbe.sale.dto.SaleRequestDto;
-import shop.matddang.matddangbe.sale.service.GeoApiService;
 import shop.matddang.matddangbe.sale.service.SaleService;
 import shop.matddang.matddangbe.suitableCrops.service.SuitableCropsService;
 
-import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -34,7 +29,7 @@ public class SaleApiController {
     @Operation(summary = "매물 조회 & 검색",
             description = "매물 조회 & 검색 & 필터링")
     @PostMapping
-    public ResponseEntity<CommonResponse<List<Sale>>> getSales(@RequestBody SaleRequestDto requestDto) {
+    public ResponseEntity<List<Sale>> getSales(@RequestBody SaleRequestDto requestDto) {
 
         List<Sale> saleList = saleService.searchSales(requestDto); //거래유형, 가격, 면적, 토지유형 필터링 완료
 
@@ -63,31 +58,16 @@ public class SaleApiController {
         suitableCropsService.calculateAndSaveProfitForSales(saleList);
         **/
 
-        return ResponseEntity.ok(
-                CommonResponse.<List<Sale>>builder()
-                        .status(HttpStatus.OK.value())
-                        .message("매물 조회 성공")
-                        .data(saleList)
-                        .build()
-        );
+        return ResponseEntity.ok(saleList);
 
     }
 
     //매물 상세의 적합농산물 예상 수확량 및 수익 (3개 추출)
     @Operation(summary = "적합농산물", description = "예상 수확량 & 예상수익")
     @GetMapping("/recommend/{saleId}")
-    public ResponseEntity<CommonResponse<List<SuitableCropsResponseDto>>> getRecommendCrops(@PathVariable("saleId") Long saleId) {
-
+    public ResponseEntity<List<SuitableCropsResponseDto>> getRecommendCrops(@PathVariable("saleId") Long saleId) {
         List<SuitableCropsResponseDto> dtoList = suitableCropsService.getRecommendedCrops(saleId);
-
-        return ResponseEntity.ok(
-                CommonResponse.<List<SuitableCropsResponseDto>>builder()
-                        .status(HttpStatus.OK.value())
-                        .message("적합 농산물 조회 성공")
-                        .data(dtoList)
-                        .build()
-        );
-
+        return ResponseEntity.ok(dtoList);
     }
 
 }
