@@ -3,9 +3,13 @@ package shop.matddang.matddangbe.sale.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import shop.matddang.matddangbe.Like.domain.Liked;
+import shop.matddang.matddangbe.Like.service.LikedService;
 import shop.matddang.matddangbe.crop.domain.Crop;
 import shop.matddang.matddangbe.crop.service.CropService;
 import shop.matddang.matddangbe.global.dto.CommonResponse;
@@ -34,6 +38,7 @@ public class SaleApiController {
     private final GeoApiService geoApiService;  // 좌표값 추출
     private final SuitableCropsService suitableCropsService;
     private final CropService cropService;
+    private final LikedService likedService;
 
     //매물 조회 & 검색
     @Operation(summary = "매물 조회 & 검색",
@@ -92,7 +97,7 @@ public class SaleApiController {
     }
 
     //매물 상세의 적합농산물 예상 수확량 및 수익
-    @Operation(summary = "적합농산물", description = "예상 수확량 & 예상수익")
+    @Operation(summary = "적합농산물 & 예상 수확량 & 예상수익", description = "예상 수확량 & 예상수익")
     @GetMapping("/recommend/{saleId}")
     public ResponseEntity<CommonResponse<List<SuitableCropsResponseDto>>> getRecommendCrops(@PathVariable("saleId") Long saleId) {
 
@@ -139,5 +144,29 @@ public class SaleApiController {
         );
 
     }
+
+    //매물 찜
+    @Operation(summary = "매물 찜 여부", description = "매물 찜 여부")
+    @GetMapping("/is-liked/{saleId}")
+    public ResponseEntity<CommonResponse<List<Liked>>> salesLike(@PathVariable("saleId") long saleId, @AuthenticationPrincipal User user ) {
+        Long userId = Long.valueOf(user.getUsername());
+
+//        String nickname = user.getUsername();
+//        Long userId = Long.valueOf(user.getUsername());
+//        boolean isLiked = likeService.SalesLiked(saleId,userId);
+//
+//        PostIsSavedResponse response = new PostIsSavedResponse(id, isScrapped);
+
+        return ResponseEntity.ok(
+                CommonResponse.<List<Liked>>builder()
+                        .status(HttpStatus.OK.value())
+                        .message("매물 찜/삭제 완료")
+                        .data(null)
+                        .build()
+        );
+    }
+
+
+
 
 }
