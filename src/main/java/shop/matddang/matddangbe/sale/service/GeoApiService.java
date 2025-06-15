@@ -5,6 +5,8 @@ import net.minidev.json.parser.ParseException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.beans.factory.annotation.Value;
+import shop.matddang.matddangbe.sale.domain.Sale;
+import shop.matddang.matddangbe.sale.repository.SaleRepository;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -12,10 +14,12 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 
 @Service
 public class GeoApiService {
+    private final SaleRepository saleRepository;
 
     private final RestTemplate restTemplate;
 
@@ -25,8 +29,9 @@ public class GeoApiService {
     @Value("${external.api.vworld.key}")
     private String apiKey;
 
-    public GeoApiService(RestTemplate restTemplate) {
+    public GeoApiService(RestTemplate restTemplate, SaleService saleService, SaleRepository saleRepository) {
         this.restTemplate = restTemplate;
+        this.saleRepository = saleRepository;
     }
 
     public Double[] getGeoCoordFromAddress(String address) {
@@ -79,5 +84,22 @@ public class GeoApiService {
         return new Double[]{(double)0, (double) 0};
     }
 
+    // 주소 기반 위도, 경도 추출
+    public void LocationSaveService(List<Sale> saleList) {
+        for (Sale sale : saleList) {
+            if (sale.getWgsX() == null || sale.getWgsX() == 0L) {
+                Double[] coords = getGeoCoordFromAddress(sale.getSaleAddr());
 
+                if (coords != null && coords.length == 2) {
+                    sale.setWgsX(coords[0]);
+                    sale.setWgsY(coords[1]);
+                } else {
+                    // 예외 처리로 0으로 설정
+                    sale.setWgsX((double) 0);
+                    sale.setWgsY((double) 0);
+                }
+                saleRepository.save(sale);
+            }
+        }
+    }
 }
