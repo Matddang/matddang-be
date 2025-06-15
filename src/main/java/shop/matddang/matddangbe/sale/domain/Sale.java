@@ -6,7 +6,7 @@ import lombok.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-@Table(name = "Sale")
+@Table(name = "sale")
 @Entity
 @Data
 @EqualsAndHashCode(callSuper = false)

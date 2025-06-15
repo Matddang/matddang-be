@@ -4,7 +4,7 @@ package shop.matddang.matddangbe.crop.domain;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Table(name = "Crop")
+@Table(name = "crop")
 @Entity
 @Data
 @EqualsAndHashCode(callSuper = false)
