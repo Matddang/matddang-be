@@ -6,7 +6,7 @@ import lombok.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-@Table(name = "Sale")
+@Table(name = "sale")
 @Entity
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -50,5 +50,10 @@ public class Sale{
     @Column(name = "area")
     private BigDecimal area;
 
+    @Column(name = "main_crop")
+    private String mainCrop; //대표작물 (수익이 가장 큰)
+
+    @Column(name = "profit")
+    private BigDecimal profit; //예상수익 (가장 큰 수익) , 추후 수익순 정렬을 위해 삽입한 칼럼
 
 }
