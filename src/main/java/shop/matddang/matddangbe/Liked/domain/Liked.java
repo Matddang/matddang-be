@@ -1,8 +1,8 @@
-package shop.matddang.matddangbe.Like.domain;
+package shop.matddang.matddangbe.Liked.domain;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Table(name = "Like")
+@Table(name = "liked")
 @Entity
 @Data
 @EqualsAndHashCode(callSuper = false)

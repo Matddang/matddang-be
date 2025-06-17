@@ -1,9 +1,9 @@
-package shop.matddang.matddangbe.Like.service;
+package shop.matddang.matddangbe.Liked.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import shop.matddang.matddangbe.Like.domain.Liked;
-import shop.matddang.matddangbe.Like.repository.LikedRepository;
+import shop.matddang.matddangbe.Liked.domain.Liked;
+import shop.matddang.matddangbe.Liked.repository.LikedRepository;
 import shop.matddang.matddangbe.user.repository.UserRepository;
 
 import java.util.Optional;
@@ -26,7 +26,7 @@ public class LikedService {
         );
 
 
-        Optional<Liked> likeScrap = LikedRepository.findByUserIdAndsaleId(userId, saleId);
+        Optional<Liked> likeScrap = LikedRepository.findByUserIdAndSaleId(userId, saleId);
         return likeScrap.isPresent();
     }
 
