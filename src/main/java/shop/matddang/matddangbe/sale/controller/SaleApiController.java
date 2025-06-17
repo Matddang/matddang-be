@@ -69,4 +69,15 @@ public class SaleApiController {
         return ResponseEntity.ok(dtoList);
     }
 
+    //매물 조회 & 검색
+    @Operation(summary = "매물 ID별 상세 정보",
+            description = "매물 ID별 상세 정보")
+    @GetMapping("/{saleId}")
+    public ResponseEntity<List<Sale>> getSalesDetail(@PathVariable("saleId") Long saleId) {
+
+        List<Sale> saleList = saleService.findBySaleId(saleId);
+        return ResponseEntity.ok(saleList);
+
+    }
+
 }
