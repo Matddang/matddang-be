@@ -17,7 +17,7 @@ public class Liked {
     private Long saleId;
 
     @Column(name="user_id")
-    private Long userId;
+    private String userId;
 
 }
 

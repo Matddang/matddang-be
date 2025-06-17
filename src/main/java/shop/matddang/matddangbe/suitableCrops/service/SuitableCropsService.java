@@ -70,7 +70,7 @@ public class SuitableCropsService {
     public void calculateAndSaveProfitForSales(List<Sale> saleList) {
         for (Sale sale : saleList) {
             // 예상수익 계산 및 저장
-            if (sale.getProfit() == null || sale.getProfit().equals(BigDecimal.ZERO)) {
+//            if (sale.getProfit() == null || sale.getProfit().equals(BigDecimal.ZERO)) {
                 List<SuitableCropsResponseDto> recommendedCrops = getRecommendedCrops(sale.getSaleId());
 
                 Optional<SuitableCropsResponseDto> maxProfitCrop = recommendedCrops.stream()
@@ -84,7 +84,7 @@ public class SuitableCropsService {
                 });
 
                 saleRepository.save(sale);
-            }
+//            }
         }
     }
 

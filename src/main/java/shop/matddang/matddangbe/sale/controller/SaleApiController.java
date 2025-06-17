@@ -4,6 +4,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 import shop.matddang.matddangbe.sale.domain.Sale;
 import shop.matddang.matddangbe.suitableCrops.dto.SuitableCropsResponseDto;
@@ -69,7 +71,7 @@ public class SaleApiController {
         return ResponseEntity.ok(dtoList);
     }
 
-    //매물 조회 & 검색
+    //매물 ID별 상세 정보 로드
     @Operation(summary = "매물 ID별 상세 정보",
             description = "매물 ID별 상세 정보")
     @GetMapping("/{saleId}")
@@ -79,5 +81,22 @@ public class SaleApiController {
         return ResponseEntity.ok(saleList);
 
     }
+
+
+//    // 매물의 좋아요 유무
+//    @Operation(summary = "매물의 좋아요 유무")
+//    @GetMapping("/is-liked/{saleId}")
+//    public ResponseEntity<ResponseTemplate<Object>> getSaleLiked(@PathVariable("saleId") long saleId, @AuthenticationPrincipal User currentUser) {
+//
+//        String userId = currentUser.getUsername();
+//        System.out.println("userId: "+userId);
+//        // 유저id는 String으로 검색하도록  -> 검색시에도 String으로 저장
+//        boolean isScrapped = postService.ArticleIsScrapped(id, customUserDetails);
+//
+//        PostIsSavedResponse response = new PostIsSavedResponse(id, isScrapped);
+//        return ResponseEntity
+//                .status(HttpStatus.OK)
+//                .body(ResponseTemplate.from(response));
+//    }
 
 }
