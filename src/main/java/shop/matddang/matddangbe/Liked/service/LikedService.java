@@ -13,23 +13,18 @@ import java.util.Optional;
 public class LikedService {
 
     private final LikedRepository LikedRepository;
-    private final UserRepository userRepository;
 
-    // 아티클 스크랩 유무 확인
-    public boolean SalesLiked(Long saleId, String userId) {
+    // 매물 좋아요 유무 확인
+    public boolean saleIsLiked(Long saleId, Long userId) {
         if (userId == null) {
             throw new IllegalArgumentException("로그인 상태가 아닙니다.");
         }
 
-//        userRepository.findById(userId).orElseThrow(() ->
-//                new IllegalArgumentException("해당 userId의 user 찾을 수 없음 id: " + userId)
-//        );
-
-
-        Optional<Liked> likeScrap = LikedRepository.findByUserIdAndSaleId(userId, saleId);
-        return likeScrap.isPresent();
+        Optional<Liked> userLiked = LikedRepository.findByUserIdAndSaleId(userId, saleId);
+        return userLiked.isPresent();
     }
 
-
-
 }
+
+
+

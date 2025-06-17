@@ -3,16 +3,19 @@ package shop.matddang.matddangbe.sale.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
+import shop.matddang.matddangbe.Liked.service.LikedService;
 import shop.matddang.matddangbe.sale.domain.Sale;
 import shop.matddang.matddangbe.suitableCrops.dto.SuitableCropsResponseDto;
 import shop.matddang.matddangbe.suitableCrops.domain.SuitableCrops;
 import shop.matddang.matddangbe.sale.dto.SaleRequestDto;
 import shop.matddang.matddangbe.sale.service.SaleService;
 import shop.matddang.matddangbe.suitableCrops.service.SuitableCropsService;
+import shop.matddang.matddangbe.user.service.AuthService;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -25,6 +28,7 @@ public class SaleApiController {
 
     private final SaleService saleService;
     private final SuitableCropsService suitableCropsService;
+    private final LikedService likedService;
 
     //매물 조회 & 검색
     @Operation(summary = "매물 조회 & 검색",
@@ -82,21 +86,19 @@ public class SaleApiController {
 
     }
 
+    @Operation(summary = "매물의 좋아요 유무")
+    @GetMapping("/is-liked/{saleId}")
+    public ResponseEntity<Object> getSaleIsLiked(@PathVariable("saleId") Long saleId, @AuthenticationPrincipal User currentUser) {
 
-//    // 매물의 좋아요 유무
-//    @Operation(summary = "매물의 좋아요 유무")
-//    @GetMapping("/is-liked/{saleId}")
-//    public ResponseEntity<ResponseTemplate<Object>> getSaleLiked(@PathVariable("saleId") long saleId, @AuthenticationPrincipal User currentUser) {
-//
-//        String userId = currentUser.getUsername();
-//        System.out.println("userId: "+userId);
-//        // 유저id는 String으로 검색하도록  -> 검색시에도 String으로 저장
-//        boolean isScrapped = postService.ArticleIsScrapped(id, customUserDetails);
-//
-//        PostIsSavedResponse response = new PostIsSavedResponse(id, isScrapped);
-//        return ResponseEntity
-//                .status(HttpStatus.OK)
-//                .body(ResponseTemplate.from(response));
-//    }
+        if (currentUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("로그인된 사용자만 접근할 수 있습니다.");
+        }
+
+        Long userId = Long.parseLong(currentUser.getUsername());
+        boolean isLiked = likedService.saleIsLiked(saleId, userId);
+        return ResponseEntity.ok(isLiked);
+
+    }
 
 }
