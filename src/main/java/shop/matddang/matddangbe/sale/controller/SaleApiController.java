@@ -3,7 +3,6 @@ package shop.matddang.matddangbe.sale.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import shop.matddang.matddangbe.sale.domain.Sale;
@@ -68,6 +67,17 @@ public class SaleApiController {
     public ResponseEntity<List<SuitableCropsResponseDto>> getRecommendCrops(@PathVariable("saleId") Long saleId) {
         List<SuitableCropsResponseDto> dtoList = suitableCropsService.getRecommendedCrops(saleId);
         return ResponseEntity.ok(dtoList);
+    }
+
+    //매물 조회 & 검색
+    @Operation(summary = "매물 ID별 상세 정보",
+            description = "매물 ID별 상세 정보")
+    @GetMapping("/{saleId}")
+    public ResponseEntity<List<Sale>> getSalesDetail(@PathVariable("saleId") Long saleId) {
+
+        List<Sale> saleList = saleService.findBySaleId(saleId);
+        return ResponseEntity.ok(saleList);
+
     }
 
 }
