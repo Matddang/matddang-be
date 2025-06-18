@@ -10,4 +10,5 @@ import java.util.List;
 public interface SearchAddrRepository extends JpaRepository<SearchAddr,Long> {
     List<SearchAddr> findByUserIdOrderBySearchTimeAsc(Long UserId);
     List<SearchAddr> findByUserIdAndKeyword(Long userId, String keyword);
+    List<SearchAddr> findByUserIdOrderBySearchTimeDesc(Long userId);
 }

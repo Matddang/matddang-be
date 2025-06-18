@@ -16,7 +16,7 @@ public class LikedService {
     private final LikedRepository likedRepository;
 
     // 매물 좋아요 유무 확인
-    public List<Liked> getLikedSaleList(Long saleId, Long userId) {
+    public List<Liked> getLikedSaleList(Long userId) {
         if (userId == null) {
             throw new IllegalArgumentException("로그인 상태가 아닙니다.");
         }
