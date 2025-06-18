@@ -26,4 +26,6 @@ public class SaleRequestDto {
     private List<String> landCategoryList; // [전_전, 답_답, 과수원]
     private List<Long> cropIds; //[1,2,3,4]
 
+    private List<Double> location; //[155.496327, 128.48978]
+
 }
