@@ -3,6 +3,8 @@ package shop.matddang.matddangbe.sale.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -19,7 +21,8 @@ import shop.matddang.matddangbe.suitableCrops.domain.SuitableCrops;
 import shop.matddang.matddangbe.sale.dto.SaleRequestDto;
 import shop.matddang.matddangbe.sale.service.SaleService;
 import shop.matddang.matddangbe.suitableCrops.service.SuitableCropsService;
-
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -38,9 +41,9 @@ public class SaleApiController {
     @Operation(summary = "매물 조회 & 검색",
             description = "매물 조회 & 검색 & 필터링")
     @PostMapping
-    public ResponseEntity<List<Sale>> getSales(@RequestBody SaleRequestDto requestDto) {
+    public ResponseEntity<?> getSales(@RequestBody SaleRequestDto requestDto) {
 
-        List<Sale> saleList = saleService.searchSales(requestDto); //거래유형, 가격, 면적, 토지유형 필터링 완료
+        List<Sale> saleList = saleService.searchSales(requestDto);
 
         // 농작물 필터링
         if (!requestDto.getCropIds().isEmpty()) {
@@ -73,7 +76,16 @@ public class SaleApiController {
          suitableCropsService.calculateAndSaveProfitForSales(saleList);
          **/
 
-        return ResponseEntity.ok(saleList);
+        // 페이징
+        int page = Math.max(0, requestDto.getPage() - 1);
+        int size = Math.max(1, requestDto.getSize());
+        int start = page * size;
+        int end = Math.min(start + size, saleList.size());
+
+        List<Sale> pagedSales = saleList.subList(start, end);
+        Page<Sale> salePage = new PageImpl<>(pagedSales, PageRequest.of(page, size), saleList.size());
+
+        return ResponseEntity.ok(salePage);
 
     }
 

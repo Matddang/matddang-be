@@ -15,6 +15,9 @@ import java.util.List;
 @Builder
 public class SaleRequestDto {
 
+    private int page;
+    private int size = 10;
+
     private List<String> saleCategoryList; // [임대, 매매]
 
     private BigDecimal minPrice; // 최소 가격
