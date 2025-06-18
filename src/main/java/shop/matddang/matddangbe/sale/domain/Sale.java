@@ -56,4 +56,7 @@ public class Sale{
     @Column(name = "profit")
     private BigDecimal profit; //예상수익 (가장 큰 수익) , 추후 수익순 정렬을 위해 삽입한 칼럼
 
+    @Column(name = "img_url")
+    private String imgUrl; // 추후..
+
 }

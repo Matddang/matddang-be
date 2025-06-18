@@ -7,7 +7,6 @@ import shop.matddang.matddangbe.suitableCrops.domain.SuitableCrops;
 import shop.matddang.matddangbe.sale.dto.SaleRequestDto;
 import shop.matddang.matddangbe.sale.repository.SaleRepository;
 import shop.matddang.matddangbe.sale.repository.SuitableCropsRepository;
-
 import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.List;
@@ -69,13 +68,12 @@ public class SaleService {
             requestDto.setLandCategoryList(List.of("전_전", "답_답", "과수원"));
         }
         // ---------------------------------------- 데이터 전처리 완료 ----------------------------------------
-
         return saleRepository.searchBySaleFilter(
                 requestDto.getSaleCategoryList(),
-                requestDto.getMinPrice(), // 최소 가격
-                requestDto.getMaxPrice(), // 최대 가격
-                requestDto.getMinArea(), // 최소 면적
-                requestDto.getMaxArea(), // 최대 면적
+                requestDto.getMinPrice(),
+                requestDto.getMaxPrice(),
+                requestDto.getMinArea(),
+                requestDto.getMaxArea(),
                 requestDto.getLandCategoryList()
         );
     }
