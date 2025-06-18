@@ -8,6 +8,7 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 import shop.matddang.matddangbe.global.domain.BaseTimeEntityWithDeletion;
 import shop.matddang.matddangbe.user.dto.response.GoogleResourceServerResponse;
+import shop.matddang.matddangbe.user.dto.response.KakaoResourceServerResponse;
 
 import java.util.UUID;
 
@@ -54,6 +55,18 @@ public class UserEntity extends BaseTimeEntityWithDeletion {
                 .name(serverResponse.name())
                 .imageUrl(serverResponse.picture())
 
+                .role(Role.USER)
+                .enabled(true)
+                .build();
+    }
+
+    public static UserEntity from(KakaoResourceServerResponse serverResponse) {
+        return UserEntity.builder()
+                .email(serverResponse.kakaoAccount().email())
+                .name(serverResponse.properties().nickname())
+                .imageUrl(serverResponse.properties().profileImage())
+
+                .nickName(serverResponse.properties().nickname())
                 .role(Role.USER)
                 .enabled(true)
                 .build();

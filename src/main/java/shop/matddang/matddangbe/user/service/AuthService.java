@@ -6,14 +6,18 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import shop.matddang.matddangbe.client.GoogleClient;
+import org.springframework.util.MultiValueMap;
+import shop.matddang.matddangbe.user.client.GoogleClient;
 import shop.matddang.matddangbe.global.redis.service.RefreshTokenRedisService;
-import shop.matddang.matddangbe.security.constants.SecurityConstants;
 import shop.matddang.matddangbe.security.jwt.JwtProvider;
+import shop.matddang.matddangbe.user.client.KakaoResourceClient;
+import shop.matddang.matddangbe.user.client.KakaoTokenClient;
 import shop.matddang.matddangbe.user.converter.AuthConverter;
 import shop.matddang.matddangbe.user.domain.UserEntity;
 import shop.matddang.matddangbe.user.dto.request.TokenRequest;
 import shop.matddang.matddangbe.user.dto.response.GoogleResourceServerResponse;
+import shop.matddang.matddangbe.user.dto.response.KakaoResourceServerResponse;
+import shop.matddang.matddangbe.user.dto.response.KakaoTokenResponse;
 import shop.matddang.matddangbe.user.dto.response.SocialLoginResponse;
 import shop.matddang.matddangbe.user.repository.UserRepository;
 
@@ -28,12 +32,20 @@ public class AuthService {
     private final UserRepository userRepository;
     private final JwtProvider jwtProvider;
     private final GoogleClient googleClient;
+    private final KakaoTokenClient kakaoTokenClient;
+    private final KakaoResourceClient kakaoResourceClient;
 
     private final AuthConverter authConverter;
 
     private final RefreshTokenRedisService refreshTokenRedisService;
     @Value("${jwt.expiration.refresh}")
     private Long REFRESH_TOKEN_EXPIRE_TIME;
+
+    @Value("${etc.kakao.client-id}")
+    private String KAKAO_CLIENT_ID;
+    @Value("${etc.kakao.redirect-uri}")
+    private String KAKAO_REDIRECT_URI;
+
 
 
     @Transactional
@@ -50,6 +62,15 @@ public class AuthService {
         return authConverter.toSocialLoginResponse(userEntity);
     }
 
+    @Transactional
+    public SocialLoginResponse loginOrRegisterKakao(String accessCode) {
+        KakaoResourceServerResponse kakaoUserInfo = requestToKakao(accessCode);
+        log.debug("카카오 사용자 정보: {}", kakaoUserInfo);
+
+        UserEntity userEntity = getOrSave(kakaoUserInfo);
+
+        return authConverter.toSocialLoginResponse(userEntity);
+    }
 
     public String createAccessTokenWhenLogin(String userId) {
 
@@ -62,11 +83,25 @@ public class AuthService {
         return TOKEN_PREFIX + accessToken;
     }
 
-
     private UserEntity getOrSave(GoogleResourceServerResponse serverResponse) {
         UserEntity userEntity = userRepository.findByEmail(serverResponse.email())
                 .orElseGet(() -> UserEntity.from(serverResponse));
         return userRepository.save(userEntity);
+    }
+
+    private UserEntity getOrSave(KakaoResourceServerResponse serverResponse) {
+        UserEntity userEntity = userRepository.findByEmail(serverResponse.kakaoAccount().email())
+                .orElseGet(() -> UserEntity.from(serverResponse));
+        return userRepository.save(userEntity);
+    }
+
+    private KakaoResourceServerResponse requestToKakao(String accessCode) {
+        MultiValueMap<String, Object> formData = authConverter.toKakaoTokenRequest(accessCode, KAKAO_CLIENT_ID, KAKAO_REDIRECT_URI);
+        KakaoTokenResponse kakaoToken = kakaoTokenClient.getKakaoToken(formData);
+        log.debug("카카오 토큰 정보: {}", kakaoToken);
+
+        String bearerHeader = TOKEN_PREFIX + kakaoToken.accessToken();
+        return kakaoResourceClient.getUserInfo(bearerHeader);
     }
 
 }
