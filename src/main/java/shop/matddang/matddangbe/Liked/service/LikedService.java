@@ -6,6 +6,7 @@ import shop.matddang.matddangbe.Liked.domain.Liked;
 import shop.matddang.matddangbe.Liked.dto.LikedResponseDto;
 import shop.matddang.matddangbe.Liked.repository.LikedRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -15,13 +16,13 @@ public class LikedService {
     private final LikedRepository likedRepository;
 
     // 매물 좋아요 유무 확인
-    public boolean saleIsLiked(Long saleId, Long userId) {
+    public List<Liked> getLikedSaleList(Long saleId, Long userId) {
         if (userId == null) {
             throw new IllegalArgumentException("로그인 상태가 아닙니다.");
         }
 
-        Optional<Liked> userLiked = likedRepository.findByUserIdAndSaleId(userId, saleId);
-        return userLiked.isPresent();
+        List<Liked> likedSaleList = likedRepository.findByUserId(userId);
+        return likedSaleList;
     }
 
 

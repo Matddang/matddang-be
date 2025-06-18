@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
+import shop.matddang.matddangbe.Liked.domain.Liked;
 import shop.matddang.matddangbe.Liked.dto.LikedResponseDto;
 import shop.matddang.matddangbe.Liked.service.LikedService;
 import shop.matddang.matddangbe.sale.domain.Sale;
@@ -86,7 +87,7 @@ public class SaleApiController {
 
     }
 
-    @Operation(summary = "매물의 좋아요 유무")
+    @Operation(summary = "유저별 매물의 좋아요")
     @GetMapping("/is-liked/{saleId}")
     public ResponseEntity<Object> getSaleIsLiked(@PathVariable("saleId") Long saleId, @AuthenticationPrincipal User currentUser) {
 
@@ -96,8 +97,8 @@ public class SaleApiController {
         }
 
         Long userId = Long.parseLong(currentUser.getUsername());
-        boolean isLiked = likedService.saleIsLiked(saleId, userId);
-        return ResponseEntity.ok(isLiked);
+        List<Liked> likedSaleList = likedService.getLikedSaleList(saleId, userId);
+        return ResponseEntity.ok(likedSaleList);
 
     }
 
