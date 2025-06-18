@@ -123,5 +123,11 @@ public class SaleApiController {
         return ResponseEntity.ok(responseDto);
     }
 
+    @Operation(summary = "지역/지번 기반 매물 검색")
+    @GetMapping("/search/address")
+    public ResponseEntity<Object> getSaleListSearchByAddr(@RequestParam("keyword") String keyword) {
+        List<Sale> saleList = saleService.findBySaleAddrLike(keyword);
+        return ResponseEntity.ok().body(saleList); // 결과 넣기
+    }
 
 }

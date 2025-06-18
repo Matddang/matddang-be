@@ -24,6 +24,11 @@ public class SaleService {
         return saleRepository.findBySaleId(saleId);
     }
 
+    public List<Sale> findBySaleAddrLike(String keyword) {
+        String searchKeyword = "%" + keyword + "%";
+        return saleRepository.findBySaleAddrLike(searchKeyword);
+    }
+
     public List<Sale> findAllById(Iterable<Long> saleIdList) {
         return saleRepository.findAllById(saleIdList);
     }
