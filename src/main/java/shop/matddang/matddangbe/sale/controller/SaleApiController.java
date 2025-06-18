@@ -125,9 +125,16 @@ public class SaleApiController {
 
     @Operation(summary = "지역/지번 기반 매물 검색")
     @GetMapping("/search/address")
-    public ResponseEntity<Object> getSaleListSearchByAddr(@RequestParam("keyword") String keyword) {
+    public ResponseEntity<Object> getSaleListSearchByAddr(@RequestParam("keyword") String keyword, @AuthenticationPrincipal User currentUser) {
+
         List<Sale> saleList = saleService.findBySaleAddrLike(keyword);
-        return ResponseEntity.ok().body(saleList); // 결과 넣기
+
+        if ( currentUser !=null ){
+            Long userId = Long.parseLong(currentUser.getUsername());
+            saleService.saveSearchKeyword(userId,keyword);
+        }
+
+        return ResponseEntity.ok().body(saleList);
     }
 
 }
