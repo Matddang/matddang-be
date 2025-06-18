@@ -57,6 +57,12 @@ public class SaleApiController {
 
         }
 
+
+        if (!requestDto.getLocation().isEmpty()){
+            // 지정 장소 기반 거리 정렬 필터
+            saleList = saleService.getsearchSalesByLocation(requestDto.getLocation(),saleList); //거래유형, 가격, 면적, 토지유형 필터링 완료
+        }
+
         /**
          // 주소 기반 위도, 경도 추출
          geoApiService.LocationSaveService(saleList);

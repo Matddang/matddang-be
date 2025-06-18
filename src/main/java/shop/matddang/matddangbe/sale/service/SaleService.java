@@ -9,7 +9,9 @@ import shop.matddang.matddangbe.sale.repository.SaleRepository;
 import shop.matddang.matddangbe.sale.repository.SuitableCropsRepository;
 
 import java.math.BigDecimal;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -79,6 +81,31 @@ public class SaleService {
     // Sale 저장
     public Sale save(Sale sale) {
         return saleRepository.save(sale);
+    }
+
+    //거리 기반 정렬
+    public List<Sale> getsearchSalesByLocation(List<Double> location, List<Sale> saleList) {
+        return saleList.stream()
+                .sorted(Comparator.comparingDouble(sale ->
+                        calculateDistance(location.get(0), location.get(1), sale.getWgsY(), sale.getWgsX())
+                ))
+                .collect(Collectors.toList());
+    }
+
+    //거리 계산
+    private double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
+        final int EARTH_RADIUS_KM = 6371;
+
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLon = Math.toRadians(lon2 - lon1);
+
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
+                        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+        return EARTH_RADIUS_KM * c; // 단위: km
     }
 
 }
