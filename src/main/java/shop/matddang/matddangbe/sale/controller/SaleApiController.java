@@ -12,6 +12,8 @@ import shop.matddang.matddangbe.Liked.domain.Liked;
 import shop.matddang.matddangbe.Liked.dto.LikedResponseDto;
 import shop.matddang.matddangbe.Liked.service.LikedService;
 import shop.matddang.matddangbe.sale.domain.Sale;
+import shop.matddang.matddangbe.sale.domain.SearchAddr;
+import shop.matddang.matddangbe.sale.service.SearchAddrService;
 import shop.matddang.matddangbe.suitableCrops.dto.SuitableCropsResponseDto;
 import shop.matddang.matddangbe.suitableCrops.domain.SuitableCrops;
 import shop.matddang.matddangbe.sale.dto.SaleRequestDto;
@@ -30,6 +32,7 @@ public class SaleApiController {
     private final SaleService saleService;
     private final SuitableCropsService suitableCropsService;
     private final LikedService likedService;
+    private final SearchAddrService searchAddrService;
 
     //매물 조회 & 검색
     @Operation(summary = "매물 조회 & 검색",
@@ -94,8 +97,8 @@ public class SaleApiController {
     }
 
     @Operation(summary = "유저별 매물의 좋아요")
-    @GetMapping("/is-liked/{saleId}")
-    public ResponseEntity<Object> getSaleIsLiked(@PathVariable("saleId") Long saleId, @AuthenticationPrincipal User currentUser) {
+    @GetMapping("/liked/list")
+    public ResponseEntity<Object> getSaleIsLiked(@AuthenticationPrincipal User currentUser) {
 
         if (currentUser == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
@@ -103,7 +106,7 @@ public class SaleApiController {
         }
 
         Long userId = Long.parseLong(currentUser.getUsername());
-        List<Liked> likedSaleList = likedService.getLikedSaleList(saleId, userId);
+        List<Liked> likedSaleList = likedService.getLikedSaleList(userId);
         return ResponseEntity.ok(likedSaleList);
 
     }
@@ -123,5 +126,34 @@ public class SaleApiController {
         return ResponseEntity.ok(responseDto);
     }
 
+    @Operation(summary = "지역/지번 기반 매물 검색")
+    @GetMapping("/search/address")
+    public ResponseEntity<Object> getSaleListSearchByAddr(@RequestParam("keyword") String keyword, @AuthenticationPrincipal User currentUser) {
+
+        List<Sale> saleList = saleService.findBySaleAddrLike(keyword);
+
+        if ( currentUser !=null ){
+            Long userId = Long.parseLong(currentUser.getUsername());
+            searchAddrService.saveSearchKeyword(userId,keyword);
+        }
+
+        return ResponseEntity.ok().body(saleList);
+    }
+
+    @Operation(summary = "유저별 검색기록")
+    @GetMapping("/keyword/list")
+    public ResponseEntity<Object> getSaleListSearchByAddr(@AuthenticationPrincipal User currentUser) {
+
+        if (currentUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("로그인된 사용자만 접근할 수 있습니다.");
+
+        }else{
+            Long userId = Long.parseLong(currentUser.getUsername());
+            List<SearchAddr> searchAddrList = searchAddrService.getKeywordList(userId);
+            return ResponseEntity.ok(searchAddrList);
+        }
+
+    }
 
 }

@@ -28,4 +28,8 @@ public interface SaleRepository extends JpaRepository<Sale,Long> {
         );
 
     List<Sale> findBySaleId(Long saleId);
+
+
+    @Query(value = "SELECT * FROM sale s WHERE s.sale_addr LIKE :keyword", nativeQuery = true)
+    List<Sale> findBySaleAddrLike(@Param("keyword") String keyword);
 }
