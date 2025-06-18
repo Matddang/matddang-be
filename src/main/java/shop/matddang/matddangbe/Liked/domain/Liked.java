@@ -13,6 +13,9 @@ public class Liked {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="no")
+    private Long no;
+
     @Column(name="sale_id")
     private Long saleId;
 

@@ -41,3 +41,6 @@ application-oauth.yml
 
 .env
 /src/main/resources/application-apikey.yml
+
+# MapStruct 또는 기타 코드 생성 관련 클래스 무시
+/src/main/generated/shop/matddang/matddangbe/user/converter/AuthConverterImpl.java

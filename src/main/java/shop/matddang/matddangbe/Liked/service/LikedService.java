@@ -3,33 +3,53 @@ package shop.matddang.matddangbe.Liked.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import shop.matddang.matddangbe.Liked.domain.Liked;
+import shop.matddang.matddangbe.Liked.dto.LikedResponseDto;
 import shop.matddang.matddangbe.Liked.repository.LikedRepository;
-import shop.matddang.matddangbe.user.repository.UserRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
 public class LikedService {
 
-    private final LikedRepository LikedRepository;
-    private final UserRepository userRepository;
+    private final LikedRepository likedRepository;
 
-    // 아티클 스크랩 유무 확인
-    public boolean SalesLiked(long saleId, Long userId) {
+    // 매물 좋아요 유무 확인
+    public List<Liked> getLikedSaleList(Long saleId, Long userId) {
         if (userId == null) {
             throw new IllegalArgumentException("로그인 상태가 아닙니다.");
         }
 
-        userRepository.findById(userId).orElseThrow(() ->
-                new IllegalArgumentException("해당 userId의 user 찾을 수 없음 id: " + userId)
-        );
-
-
-        Optional<Liked> likeScrap = LikedRepository.findByUserIdAndSaleId(userId, saleId);
-        return likeScrap.isPresent();
+        List<Liked> likedSaleList = likedRepository.findByUserId(userId);
+        return likedSaleList;
     }
 
 
+    public LikedResponseDto toggleSaleLike(Long saleId, Long userId) {
+        if (userId == null) {
+            throw new IllegalArgumentException("로그인 상태가 아닙니다.");
+        }
+
+
+        Optional<Liked> existing = likedRepository.findByUserIdAndSaleId(userId, saleId);
+
+        if (existing.isPresent()) {
+            likedRepository.delete(existing.get());
+            return new LikedResponseDto(userId, saleId, "UNLIKED"); // 좋아요 취소됨
+        } else {
+            Liked liked = Liked.builder()
+                    .userId(userId)
+                    .saleId(saleId)
+                    .build();
+            likedRepository.save(liked);
+            return new LikedResponseDto(userId, saleId, "LIKED"); // 좋아요 등록됨
+        }
+
+    }
+
 
 }
+
+
+
