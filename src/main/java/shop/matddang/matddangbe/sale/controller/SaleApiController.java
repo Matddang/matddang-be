@@ -13,6 +13,7 @@ import shop.matddang.matddangbe.Liked.dto.LikedResponseDto;
 import shop.matddang.matddangbe.Liked.service.LikedService;
 import shop.matddang.matddangbe.sale.domain.Sale;
 import shop.matddang.matddangbe.sale.domain.SearchAddr;
+import shop.matddang.matddangbe.sale.service.SaleCompareService;
 import shop.matddang.matddangbe.sale.service.SearchAddrService;
 import shop.matddang.matddangbe.suitableCrops.dto.SuitableCropsResponseDto;
 import shop.matddang.matddangbe.suitableCrops.domain.SuitableCrops;
@@ -33,6 +34,7 @@ public class SaleApiController {
     private final SuitableCropsService suitableCropsService;
     private final LikedService likedService;
     private final SearchAddrService searchAddrService;
+    private final SaleCompareService saleCompareService;
 
     //매물 조회 & 검색
     @Operation(summary = "매물 조회 & 검색",
@@ -152,6 +154,21 @@ public class SaleApiController {
             Long userId = Long.parseLong(currentUser.getUsername());
             List<SearchAddr> searchAddrList = searchAddrService.getKeywordList(userId);
             return ResponseEntity.ok(searchAddrList);
+        }
+
+    }
+
+    @Operation(summary = "매물 비교 - 비교한 기록 저장")
+    @GetMapping("/compare/{saleId1}/{saleId2}")
+    public ResponseEntity<Object> setCompareData(@AuthenticationPrincipal User currentUser, @PathVariable("saleId1") Long saleId1 , @PathVariable("saleId2") Long saleId2) {
+        if (currentUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("로그인된 사용자만 접근할 수 있습니다.");
+
+        }else{
+            Long userId = Long.parseLong(currentUser.getUsername());
+            saleCompareService.saveCompare(userId, saleId1, saleId2);
+            return ResponseEntity.ok("비교 데이터 저장");
         }
 
     }
