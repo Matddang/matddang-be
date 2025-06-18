@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
+import shop.matddang.matddangbe.Liked.dto.LikedResponseDto;
 import shop.matddang.matddangbe.Liked.service.LikedService;
 import shop.matddang.matddangbe.sale.domain.Sale;
 import shop.matddang.matddangbe.suitableCrops.dto.SuitableCropsResponseDto;
@@ -15,7 +16,6 @@ import shop.matddang.matddangbe.suitableCrops.domain.SuitableCrops;
 import shop.matddang.matddangbe.sale.dto.SaleRequestDto;
 import shop.matddang.matddangbe.sale.service.SaleService;
 import shop.matddang.matddangbe.suitableCrops.service.SuitableCropsService;
-import shop.matddang.matddangbe.user.service.AuthService;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -57,11 +57,11 @@ public class SaleApiController {
         }
 
         /**
-        // 주소 기반 위도, 경도 추출
-        geoApiService.LocationSaveService(saleList);
-        // 매물별 대표작물, 최대 수익 계산 로직 (하나씩만)
-        suitableCropsService.calculateAndSaveProfitForSales(saleList);
-        **/
+         // 주소 기반 위도, 경도 추출
+         geoApiService.LocationSaveService(saleList);
+         // 매물별 대표작물, 최대 수익 계산 로직 (하나씩만)
+         suitableCropsService.calculateAndSaveProfitForSales(saleList);
+         **/
 
         return ResponseEntity.ok(saleList);
 
@@ -100,5 +100,21 @@ public class SaleApiController {
         return ResponseEntity.ok(isLiked);
 
     }
+
+    @Operation(summary = "매물 좋아요/취소")
+    @GetMapping("/liked/{saleId}")
+    public ResponseEntity<Object> saleLiked(@PathVariable("saleId") Long saleId, @AuthenticationPrincipal User currentUser) {
+
+        if (currentUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("로그인된 사용자만 접근할 수 있습니다.");
+        }
+
+        Long userId = Long.parseLong(currentUser.getUsername());
+
+        LikedResponseDto responseDto = likedService.toggleSaleLike(saleId, userId);
+        return ResponseEntity.ok(responseDto);
+    }
+
 
 }
