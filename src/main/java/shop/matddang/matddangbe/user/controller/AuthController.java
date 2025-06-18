@@ -30,7 +30,7 @@ public class AuthController {
 
     }
 
-    @PostMapping("/login/kakao")
+    @GetMapping("/login/kakao")
     public ResponseEntity<SocialLoginResponse> kakaoLogin(
             @RequestParam("code") String accessCode
     ) {
