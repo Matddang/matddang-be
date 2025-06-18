@@ -13,6 +13,7 @@ import shop.matddang.matddangbe.Liked.dto.LikedResponseDto;
 import shop.matddang.matddangbe.Liked.service.LikedService;
 import shop.matddang.matddangbe.sale.domain.Sale;
 import shop.matddang.matddangbe.sale.domain.SearchAddr;
+import shop.matddang.matddangbe.sale.dto.SaleCompareResponseDto;
 import shop.matddang.matddangbe.sale.service.SaleCompareService;
 import shop.matddang.matddangbe.sale.service.SearchAddrService;
 import shop.matddang.matddangbe.suitableCrops.dto.SuitableCropsResponseDto;
@@ -172,5 +173,21 @@ public class SaleApiController {
         }
 
     }
+
+    @Operation(summary = "매물 비교 리스트")
+    @GetMapping("/compare/list")
+    public ResponseEntity<Object> getCompareList(@AuthenticationPrincipal User currentUser) {
+        if (currentUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("로그인된 사용자만 접근할 수 있습니다.");
+
+        }else{
+            Long userId = Long.parseLong(currentUser.getUsername());
+            List<SaleCompareResponseDto> comparelist = saleCompareService.getCompareHistory(userId);
+            return ResponseEntity.ok(comparelist);
+        }
+
+    }
+
 
 }

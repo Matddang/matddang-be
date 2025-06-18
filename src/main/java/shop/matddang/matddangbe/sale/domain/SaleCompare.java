@@ -4,7 +4,7 @@ package shop.matddang.matddangbe.sale.domain;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 
 @Table(name = "saleCompare")
@@ -31,9 +31,8 @@ public class SaleCompare {
     @Column(name = "sale_id2")
     private Long saleId2;
 
-
-    @Column(name = "search_time")
-    private LocalDateTime searchTime;
+    @Column(name = "compare_time")
+    private LocalDate compareTime;
 
 
 }

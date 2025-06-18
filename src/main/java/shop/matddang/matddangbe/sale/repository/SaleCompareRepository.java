@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import shop.matddang.matddangbe.sale.domain.SaleCompare;
+import java.util.List;
 
 
 @Repository
@@ -13,4 +14,6 @@ public interface SaleCompareRepository extends JpaRepository<SaleCompare,Long>{
             "WHERE (sc.saleId1 = :id1 AND sc.saleId2 = :id2) " +
             "   OR (sc.saleId1 = :id2 AND sc.saleId2 = :id1)")
     boolean existsBySaleIds(@Param("id1") Long saleId1, @Param("id2") Long saleId2);
+
+    List<SaleCompare> findByUserId(Long userId);
 }
