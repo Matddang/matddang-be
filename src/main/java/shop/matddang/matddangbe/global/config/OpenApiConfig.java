@@ -35,13 +35,11 @@ public class OpenApiConfig {
 
         SecurityRequirement securityRequirement = new SecurityRequirement().addList(jwtSchemeName);
 
-        Server server = new Server();
-        server.setUrl("https://요청하는URL로_바꿔주세요");
 
         return new OpenAPI()
                 .components(components)
                 .addSecurityItem(securityRequirement)
-                .addServersItem(server)
+                .addServersItem(new Server().url("/"))
                 .info(apiInfo());
     }
 
