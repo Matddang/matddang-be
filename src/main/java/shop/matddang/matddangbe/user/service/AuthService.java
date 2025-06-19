@@ -19,9 +19,12 @@ import shop.matddang.matddangbe.user.dto.response.GoogleResourceServerResponse;
 import shop.matddang.matddangbe.user.dto.response.KakaoResourceServerResponse;
 import shop.matddang.matddangbe.user.dto.response.KakaoTokenResponse;
 import shop.matddang.matddangbe.user.dto.response.SocialLoginResponse;
+import shop.matddang.matddangbe.user.exception.AuthenticationErrorCode;
+import shop.matddang.matddangbe.user.exception.AuthenticationException;
 import shop.matddang.matddangbe.user.repository.UserRepository;
 
 import static shop.matddang.matddangbe.security.constants.SecurityConstants.*;
+import static shop.matddang.matddangbe.user.exception.AuthenticationErrorCode.*;
 
 @Service
 @RequiredArgsConstructor
@@ -54,8 +57,14 @@ public class AuthService {
         String bearerHeader = TOKEN_PREFIX + tokenRequest.accessToken();
 
         // 구글 리소스 서버에 access token으로 사용자 정보 요청
-        GoogleResourceServerResponse googleUserInfo = googleClient.getUserInfo(bearerHeader);
-        log.debug("구글 사용자 정보: {}", googleUserInfo);
+        GoogleResourceServerResponse googleUserInfo;
+        try {
+            googleUserInfo = googleClient.getUserInfo(bearerHeader);
+            log.debug("구글 사용자 정보: {}", googleUserInfo);
+        } catch (Exception e) {
+            log.error("구글 사용자 정보 요청 실패: {}", e.getMessage());
+            throw new AuthenticationException(GOOGLE_AUTHENTICATION_FAILED, e.getMessage());
+        }
 
         UserEntity userEntity = getOrSave(googleUserInfo);
 
@@ -96,12 +105,20 @@ public class AuthService {
     }
 
     private KakaoResourceServerResponse requestToKakao(String accessCode) {
-        MultiValueMap<String, Object> formData = authConverter.toKakaoTokenRequest(accessCode, KAKAO_CLIENT_ID, KAKAO_REDIRECT_URI);
-        KakaoTokenResponse kakaoToken = kakaoTokenClient.getKakaoToken(formData);
-        log.debug("카카오 토큰 정보: {}", kakaoToken);
 
-        String bearerHeader = TOKEN_PREFIX + kakaoToken.accessToken();
-        return kakaoResourceClient.getUserInfo(bearerHeader);
+        try {
+
+            MultiValueMap<String, Object> formData = authConverter.toKakaoTokenRequest(accessCode, KAKAO_CLIENT_ID, KAKAO_REDIRECT_URI);
+            KakaoTokenResponse kakaoToken = kakaoTokenClient.getKakaoToken(formData);
+            log.debug("카카오 토큰 정보: {}", kakaoToken);
+
+            String bearerHeader = TOKEN_PREFIX + kakaoToken.accessToken();
+            return kakaoResourceClient.getUserInfo(bearerHeader);
+
+        } catch (Exception e) {
+            log.error("카카오 사용자 정보 요청 실패: {}", e.getMessage());
+            throw new AuthenticationException(KAKAO_AUTHENTICATION_FAILED, e.getMessage());
+        }
     }
 
 }
