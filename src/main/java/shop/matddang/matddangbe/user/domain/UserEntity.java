@@ -8,6 +8,7 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 import shop.matddang.matddangbe.global.domain.BaseTimeEntityWithDeletion;
 import shop.matddang.matddangbe.user.dto.response.GoogleResourceServerResponse;
+import shop.matddang.matddangbe.user.dto.response.KakaoResourceServerResponse;
 
 import java.util.UUID;
 
@@ -44,6 +45,9 @@ public class UserEntity extends BaseTimeEntityWithDeletion {
     @Enumerated(STRING)
     private Role role;
 
+    @Enumerated(STRING)
+    SocialLoginType socialLoginType = SocialLoginType.NONE;
+
     /**
      * UserEntity 생성 메서드
      * 회원 가입시 사용
@@ -54,13 +58,27 @@ public class UserEntity extends BaseTimeEntityWithDeletion {
                 .name(serverResponse.name())
                 .imageUrl(serverResponse.picture())
 
+                .socialLoginType(SocialLoginType.GOOGLE)
+                .role(Role.USER)
+                .enabled(true)
+                .build();
+    }
+
+    public static UserEntity from(KakaoResourceServerResponse serverResponse) {
+        return UserEntity.builder()
+                .email(serverResponse.kakaoAccount().email())
+                .name(serverResponse.properties().nickname())
+                .imageUrl(serverResponse.properties().profileImage())
+                .nickName(serverResponse.properties().nickname())
+
+                .socialLoginType(SocialLoginType.KAKAO)
                 .role(Role.USER)
                 .enabled(true)
                 .build();
     }
 
     @Builder(access = PRIVATE)
-    private UserEntity(String email, String name, String nickName, boolean enabled, Role role, String imageUrl) {
+    private UserEntity(String email, String name, String nickName, boolean enabled, Role role, String imageUrl, SocialLoginType socialLoginType) {
 
         this.email = email;
         this.name = name;
@@ -68,6 +86,7 @@ public class UserEntity extends BaseTimeEntityWithDeletion {
         this.enabled = enabled;
         this.role = role;
         this.imageUrl = imageUrl;
+        this.socialLoginType = socialLoginType;
 
     }
 }
