@@ -1,14 +1,17 @@
 package shop.matddang.matddangbe.user.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 public record KakaoResourceServerResponse(
         Long id,
         @JsonProperty("kakao_account")
-        @NotBlank
+        @NotNull @Valid
         KakaoAccount kakaoAccount,
-        @NotBlank
+        @NotNull @Valid
         KakaoProperties properties
 ) {
     public record KakaoAccount(
@@ -20,10 +23,12 @@ public record KakaoResourceServerResponse(
             Boolean isEmailValid,
             @JsonProperty("is_email_verified")
             Boolean isEmailVerified,
+            @NotBlank @Email
             String email
     ) {}
 
     public record KakaoProperties(
+            @NotBlank
             String nickname,
             @JsonProperty("profile_image") String profileImage,
             @JsonProperty("thumbnail_image") String thumbnailImage
