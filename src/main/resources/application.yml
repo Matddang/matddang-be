@@ -48,7 +48,7 @@ etc:
   kakao-token-url: https://kauth.kakao.com/oauth/token
   kakao:
     client-id: ${KAKAO_CLIENT}
-    redirect-uri: ${BASE_URL}/auth/v1/login/kakao
+    redirect-uri: ${FRONT_URL}/login/kakao
 
 jwt:
   expiration:
