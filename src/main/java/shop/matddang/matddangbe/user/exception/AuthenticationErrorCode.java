@@ -11,6 +11,7 @@ import static org.springframework.http.HttpStatus.*;
 @Getter
 public enum AuthenticationErrorCode implements ErrorCode {
 
+    USER_NOT_FOUND(NOT_FOUND, "사용자를 찾을 수 없습니다."),
     INVALID_CREDENTIALS(UNAUTHORIZED, "잘못된 인증 정보입니다."),
     ACCOUNT_LOCKED(FORBIDDEN, "계정이 잠겼습니다. 관리자에게 문의하세요."),
     ACCOUNT_DISABLED(FORBIDDEN, "계정이 비활성화되었습니다. 관리자에게 문의하세요."),
