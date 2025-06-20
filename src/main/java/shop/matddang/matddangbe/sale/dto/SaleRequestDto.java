@@ -16,7 +16,7 @@ import java.util.List;
 public class SaleRequestDto {
 
     private int page;
-    private int size = 10;
+    private int size = 257;
 
     private List<String> saleCategoryList; // [임대, 매매]
 
