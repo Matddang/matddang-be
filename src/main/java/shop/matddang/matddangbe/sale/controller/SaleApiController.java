@@ -72,6 +72,11 @@ public class SaleApiController {
             saleList = saleService.getsearchSalesByLocation(requestDto.getLocation(),saleList); //거래유형, 가격, 면적, 토지유형 필터링 완료
         }
 
+        // 정렬
+        if (requestDto.getSortBy() != null && !requestDto.getSortBy().isEmpty()) {
+            saleService.getSortSales(saleList, requestDto.getSortBy());
+        }
+
         /**
          // 주소 기반 위도, 경도 추출
          geoApiService.LocationSaveService(saleList);

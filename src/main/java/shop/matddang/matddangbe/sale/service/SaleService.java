@@ -2,6 +2,8 @@ package shop.matddang.matddangbe.sale.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import shop.matddang.matddangbe.Liked.domain.Liked;
+import shop.matddang.matddangbe.Liked.repository.LikedRepository;
 import shop.matddang.matddangbe.sale.domain.Sale;
 import shop.matddang.matddangbe.suitableCrops.domain.SuitableCrops;
 import shop.matddang.matddangbe.sale.dto.SaleRequestDto;
@@ -10,6 +12,7 @@ import shop.matddang.matddangbe.sale.repository.SuitableCropsRepository;
 import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -18,6 +21,7 @@ public class SaleService {
 
     private final SaleRepository saleRepository;
     private final SuitableCropsRepository suitableCropsRepository;  // 생성자 주입으로 변경
+    private final LikedRepository likedRepository;
 
     public List<Sale> findBySaleId(Long saleId) {
         return saleRepository.findBySaleId(saleId);
@@ -40,27 +44,7 @@ public class SaleService {
 
         //거래 유형 지정
         if (requestDto.getSaleCategoryList().isEmpty()) {
-            requestDto.setSaleCategoryList(List.of("임대", "매매"));
-        }
-
-        //최소 가격 지정
-        if (requestDto.getMinPrice() == null || requestDto.getMinPrice().compareTo(BigDecimal.ZERO) < 0) {
-            requestDto.setMinPrice(BigDecimal.ZERO);
-        }
-
-        //최대 가격 지정
-        if (requestDto.getMaxPrice() == null || requestDto.getMaxPrice().compareTo(BigDecimal.ZERO) < 0) {
-            requestDto.setMaxPrice(BigDecimal.valueOf(1000000000)); // 현재 db의 가격 최대값은 950000000
-        }
-
-        //최소 면적 지정
-        if (requestDto.getMinArea() == null || requestDto.getMinArea().compareTo(BigDecimal.ZERO) < 0) {
-            requestDto.setMinArea(BigDecimal.ZERO);
-        }
-
-        //최대 면적 지정
-        if (requestDto.getMaxArea() == null || requestDto.getMaxArea().compareTo(BigDecimal.ZERO) < 0) {
-            requestDto.setMaxArea(BigDecimal.valueOf(1000000000)); // 현재 db의 최대값은 950000000
+            requestDto.setSaleCategoryList(List.of("임대","매매"));
         }
 
         //토지 유형 지정
@@ -111,5 +95,71 @@ public class SaleService {
 
         return EARTH_RADIUS_KM * c; // 단위: km
     }
+
+    public void getSortSales(List<Sale> saleList, String sortBy) {
+        if (sortBy == null || saleList == null || saleList.isEmpty()) return;
+
+        Comparator<Sale> comparator = null;
+
+        switch (sortBy) {
+            case "profit":
+                comparator = Comparator.comparing(Sale::getProfit);
+                break;
+            case "liked":
+                getSortSalesByLiked(saleList); // liked는 별도 정렬 메서드
+                return;
+            case "both":
+                comparator = Comparator.comparing(Sale::getProfit);
+
+                List<Long> saleIds = saleList.stream()
+                        .map(Sale::getSaleId)
+                        .collect(Collectors.toList());
+
+                Set<Long> likedSaleIds = likedRepository.findBySaleIdIn(saleIds)
+                        .stream()
+                        .map(Liked::getSaleId)
+                        .collect(Collectors.toSet());
+
+                Comparator<Sale> likedComparator = Comparator.comparing(
+                        sale -> likedSaleIds.contains(sale.getSaleId()) // 좋아요가 있으면 앞에, 없으면 뒤에
+                );
+
+                // 수익 기준 정렬 후 liked 기준 정렬
+                comparator = comparator.thenComparing(likedComparator);
+                break;
+            default:
+                return;
+        }
+
+        if (comparator != null) {
+            comparator = comparator.reversed(); // desc
+            saleList.sort(comparator); // 리스트 정렬
+        }
+    }
+
+
+    public void getSortSalesByLiked(List<Sale> saleList) {
+        if (saleList == null || saleList.isEmpty()) return;
+
+        List<Long> saleIds = saleList.stream()
+                .map(Sale::getSaleId)
+                .collect(Collectors.toList());
+
+        // 좋아요된 매물 ID 목록 조회
+        List<Liked> likedList = likedRepository.findBySaleIdIn(saleIds);
+
+        Set<Long> likedSaleIds = likedList.stream()
+                .map(Liked::getSaleId)
+                .collect(Collectors.toSet());
+
+        Comparator<Sale> comparator = Comparator.comparing(
+                sale -> likedSaleIds.contains(sale.getSaleId())
+        );
+
+        saleList.sort(comparator.reversed());  // 좋아요가 있는 매물이 앞에 오게 정렬
+    }
+
+
+
 
 }
