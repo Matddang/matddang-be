@@ -12,4 +12,5 @@ public interface LikedRepository extends JpaRepository<Liked,Long> {
 
     Optional<Liked> findByUserIdAndSaleId(Long userId, Long saleId);
     List<Liked> findByUserId(Long userId);
+    List<Liked> findBySaleIdIn(List<Long> saleIds);
 }
