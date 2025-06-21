@@ -24,7 +24,6 @@ import shop.matddang.matddangbe.sale.dto.SaleRequestDto;
 import shop.matddang.matddangbe.sale.service.SaleService;
 import shop.matddang.matddangbe.suitableCrops.service.SuitableCropsService;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -71,6 +70,12 @@ public class SaleApiController {
             // 지정 장소 기반 거리 정렬 필터
             saleList = saleService.getsearchSalesByLocation(requestDto.getLocation(),saleList); //거래유형, 가격, 면적, 토지유형 필터링 완료
         }
+
+
+        if(!requestDto.getKeyword().isEmpty()){ //검색한다면
+            saleList = saleService.findBySaleAddrLike(requestDto.getKeyword());
+        }
+
 
         // 정렬
         if (requestDto.getSortBy() != null && !requestDto.getSortBy().isEmpty()) {
@@ -146,19 +151,6 @@ public class SaleApiController {
         return ResponseEntity.ok(responseDto);
     }
 
-    @Operation(summary = "지역/지번 기반 매물 검색")
-    @GetMapping("/search/address")
-    public ResponseEntity<Object> getSaleListSearchByAddr(@RequestParam("keyword") String keyword, @AuthenticationPrincipal User currentUser) {
-
-        List<Sale> saleList = saleService.findBySaleAddrLike(keyword);
-
-        if ( currentUser !=null ){
-            Long userId = Long.parseLong(currentUser.getUsername());
-            searchAddrService.saveSearchKeyword(userId,keyword);
-        }
-
-        return ResponseEntity.ok().body(saleList);
-    }
 
     @Operation(summary = "유저별 검색기록")
     @GetMapping("/keyword/list")

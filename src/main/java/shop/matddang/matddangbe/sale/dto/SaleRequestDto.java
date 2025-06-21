@@ -21,6 +21,7 @@ public class SaleRequestDto {
     private List<Long> cropIds; //[1,2,3,4]
     private List<Double> location; //[155.496327, 128.48978]
     private String sortBy; // profit, liked, both
+    private String keyword;
 
     // 기본값을 지정
     private int size = 257;
