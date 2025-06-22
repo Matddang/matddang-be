@@ -1,4 +1,4 @@
-package shop.matddang.matddangbe.user.domain;
+package shop.matddang.matddangbe.user.domain.enums;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

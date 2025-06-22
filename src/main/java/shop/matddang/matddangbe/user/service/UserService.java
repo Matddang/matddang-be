@@ -36,9 +36,13 @@ public class UserService {
 
     public UserDetailResponse getUserDetails(String userId) {
 
-        UserEntity user = userRepository.findById(Long.parseLong(userId))
-                .orElseThrow(() -> new AuthenticationException(USER_NOT_FOUND, String.format("User with ID %s not found", userId)));
+        UserEntity user = findUser(userId);
 
         return userConverter.toUserDetailResponse(user);
+    }
+
+    public UserEntity findUser(String userId) {
+        return userRepository.findById(Long.parseLong(userId))
+                .orElseThrow(() -> new AuthenticationException(USER_NOT_FOUND, String.format("User with ID %s not found", userId)));
     }
 }

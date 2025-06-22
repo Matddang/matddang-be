@@ -4,19 +4,16 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.SQLRestriction;
 import shop.matddang.matddangbe.global.domain.BaseTimeEntityWithDeletion;
+import shop.matddang.matddangbe.user.domain.enums.Role;
+import shop.matddang.matddangbe.user.domain.enums.SocialLoginType;
 import shop.matddang.matddangbe.user.dto.response.GoogleResourceServerResponse;
 import shop.matddang.matddangbe.user.dto.response.KakaoResourceServerResponse;
-
-import java.util.UUID;
 
 import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PRIVATE;
 import static lombok.AccessLevel.PROTECTED;
-import static shop.matddang.matddangbe.user.domain.Role.USER;
 
 @Entity
 @Table(name = "`user`")
