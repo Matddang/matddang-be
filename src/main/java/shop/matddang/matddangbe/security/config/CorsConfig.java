@@ -21,7 +21,6 @@ public class CorsConfig {
                 "Cache-Control"
         ));
         config.addExposedHeader("Authorization");
-        apiCorsConfigurationSource().registerCorsConfiguration("/**", config);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
