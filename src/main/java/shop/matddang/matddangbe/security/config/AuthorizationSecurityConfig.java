@@ -33,7 +33,6 @@ public class AuthorizationSecurityConfig {
             "/swagger-ui/**",
             "/auth/v1/login/google",
             "/auth/v1/login/kakao",
-            "/internal/**",
             "/sale/**"
     };
 
