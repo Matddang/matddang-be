@@ -6,6 +6,7 @@ public record UserDetailResponse(
         String name,
         String imageUrl,
         String nickName,
-        String socialLoginType
+        String socialLoginType,
+        boolean typeTestComplete
 ) {
 }

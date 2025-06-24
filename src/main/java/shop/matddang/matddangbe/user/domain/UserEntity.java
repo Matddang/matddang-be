@@ -42,6 +42,8 @@ public class UserEntity extends BaseTimeEntityWithDeletion {
     @Enumerated(STRING)
     private Role role;
 
+    private boolean typeTestComplete;
+
     @Enumerated(STRING)
     SocialLoginType socialLoginType = SocialLoginType.NONE;
 
@@ -85,5 +87,9 @@ public class UserEntity extends BaseTimeEntityWithDeletion {
         this.imageUrl = imageUrl;
         this.socialLoginType = socialLoginType;
 
+    }
+
+    public void updateUserType(boolean userType) {
+        this.typeTestComplete = userType;
     }
 }

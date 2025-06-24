@@ -45,4 +45,13 @@ public class UserService {
         return userRepository.findById(Long.parseLong(userId))
                 .orElseThrow(() -> new AuthenticationException(USER_NOT_FOUND, String.format("User with ID %s not found", userId)));
     }
+
+    @Transactional
+    public UserDetailResponse updateUserType(String userId, boolean testComplete) {
+
+        UserEntity user = findUser(userId);
+
+        user.updateUserType(testComplete);
+        return userConverter.toUserDetailResponse(user);
+    }
 }
