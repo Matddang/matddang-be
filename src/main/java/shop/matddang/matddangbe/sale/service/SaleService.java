@@ -70,12 +70,12 @@ public class SaleService {
         // 비었을 경우, 필터가 없을 때 -> 모두
 
         //거래 유형 지정
-        if (requestDto.getSaleCategoryList().isEmpty()) {
+        if (requestDto.getSaleCategoryList()==null || requestDto.getSaleCategoryList().isEmpty()) {
             requestDto.setSaleCategoryList(List.of("임대","매매"));
         }
 
         //토지 유형 지정
-        if (requestDto.getLandCategoryList().isEmpty()) {
+        if (requestDto.getLandCategoryList()==null || requestDto.getLandCategoryList().isEmpty()) {
             requestDto.setLandCategoryList(List.of("전_전", "답_답", "과수원"));
         }
         // ---------------------------------------- 데이터 전처리 완료 ----------------------------------------
