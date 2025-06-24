@@ -76,6 +76,11 @@ public class SaleApiController {
             saleList = saleService.findBySaleAddrLike(requestDto.getKeyword());
         }
 
+        if(requestDto.getZoom()!=null && !requestDto.getZoom().isEmpty()){
+            // 지도에서 반경 내의 매물만
+            saleList = saleService.findNearBy(saleList,requestDto.getZoom());
+        }
+
 
         // 정렬
         if (requestDto.getSortBy() != null && !requestDto.getSortBy().isEmpty()) {

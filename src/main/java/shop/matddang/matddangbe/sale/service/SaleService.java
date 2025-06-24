@@ -9,7 +9,7 @@ import shop.matddang.matddangbe.suitableCrops.domain.SuitableCrops;
 import shop.matddang.matddangbe.sale.dto.SaleRequestDto;
 import shop.matddang.matddangbe.sale.repository.SaleRepository;
 import shop.matddang.matddangbe.sale.repository.SuitableCropsRepository;
-import java.math.BigDecimal;
+
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
@@ -35,6 +35,33 @@ public class SaleService {
 
     public List<Sale> findAllById(Iterable<Long> saleIdList) {
         return saleRepository.findAllById(saleIdList);
+    }
+
+    public List<Sale> findNearBy(List<Sale> saleList, List<Double> zoom) {
+        if (zoom == null || zoom.size() < 4) {
+            throw new IllegalArgumentException("zoom 배열에 4개 값이 필요합니다.");
+        }
+
+        double topLat    = zoom.get(0);   // 북쪽(큰 위도)
+        double leftLng   = zoom.get(1);   // 서쪽(작은 경도)
+        double bottomLat = zoom.get(2);   // 남쪽(작은 위도)
+        double rightLng  = zoom.get(3);   // 동쪽(큰 경도)
+
+        // 혹시 값이 뒤바뀌어 들어와도 안전하게
+        double minLat = Math.min(topLat, bottomLat);
+        double maxLat = Math.max(topLat, bottomLat);
+        double minLng = Math.min(leftLng, rightLng);
+        double maxLng = Math.max(leftLng, rightLng);
+
+        return saleList.stream()
+                .filter(sale -> {
+                    Double lat = sale.getWgsY();
+                    Double lng = sale.getWgsX();
+                    return lat != null && lng != null &&
+                            lat >= minLat && lat <= maxLat &&
+                            lng >= minLng && lng <= maxLng;
+                })
+                .collect(Collectors.toList());
     }
 
     public List<Sale> searchSales(SaleRequestDto requestDto) {
