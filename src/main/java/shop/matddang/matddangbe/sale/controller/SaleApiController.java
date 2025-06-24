@@ -48,7 +48,7 @@ public class SaleApiController {
         List<Sale> saleList = saleService.searchSales(requestDto);
 
         // 농작물 필터링
-        if (!requestDto.getCropIds().isEmpty()) {
+        if (requestDto.getCropIds()!=null && !requestDto.getCropIds().isEmpty()) {
 
             List<Long> saleIds = saleList.stream()
                     .map(Sale::getSaleId)
@@ -66,17 +66,26 @@ public class SaleApiController {
         }
 
 
-        if (!requestDto.getLocation().isEmpty()){
+        if ( requestDto.getLocation() != null && !requestDto.getLocation().isEmpty()){
             // 지정 장소 기반 거리 정렬 필터
             saleList = saleService.getsearchSalesByLocation(requestDto.getLocation(),saleList); //거래유형, 가격, 면적, 토지유형 필터링 완료
         }
 
 
-        if(!requestDto.getKeyword().isEmpty()){ //검색한다면
+        if(requestDto.getKeyword()!=null && !requestDto.getKeyword().isEmpty()){ //검색한다면
             saleList = saleService.findBySaleAddrLike(requestDto.getKeyword());
         }
 
+        if(requestDto.getZoom()!=null && !requestDto.getZoom().isEmpty()){
+            // 지도에서 반경 내의 매물만
+            saleList = saleService.findNearBy(saleList,requestDto.getZoom());
+        }
 
+
+        if(requestDto.getSortBy()==null || requestDto.getSortBy().isEmpty()){
+            requestDto.setSortBy("profit"); // 수익형 추천으로 기본값 설정
+        }
+        
         // 정렬
         if (requestDto.getSortBy() != null && !requestDto.getSortBy().isEmpty()) {
             saleService.getSortSales(saleList, requestDto.getSortBy());
