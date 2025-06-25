@@ -1,5 +1,6 @@
 package shop.matddang.matddangbe.sale.service;
 
+import com.amazonaws.services.s3.AmazonS3;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import shop.matddang.matddangbe.Liked.domain.Liked;
@@ -10,6 +11,7 @@ import shop.matddang.matddangbe.sale.dto.SaleRequestDto;
 import shop.matddang.matddangbe.sale.repository.SaleRepository;
 import shop.matddang.matddangbe.sale.repository.SuitableCropsRepository;
 
+import java.net.URL;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
@@ -22,6 +24,7 @@ public class SaleService {
     private final SaleRepository saleRepository;
     private final SuitableCropsRepository suitableCropsRepository;  // 생성자 주입으로 변경
     private final LikedRepository likedRepository;
+    private final AmazonS3 amazonS3;
 
     public List<Sale> findBySaleId(Long saleId) {
         return saleRepository.findBySaleId(saleId);
@@ -79,7 +82,8 @@ public class SaleService {
             requestDto.setLandCategoryList(List.of("전_전", "답_답", "과수원"));
         }
         // ---------------------------------------- 데이터 전처리 완료 ----------------------------------------
-        return saleRepository.searchBySaleFilter(
+        /* ---------- 2) 필터 검색 ---------- */
+        List<Sale> sales = saleRepository.searchBySaleFilter(
                 requestDto.getSaleCategoryList(),
                 requestDto.getMinPrice(),
                 requestDto.getMaxPrice(),
@@ -87,6 +91,18 @@ public class SaleService {
                 requestDto.getMaxArea(),
                 requestDto.getLandCategoryList()
         );
+
+        /* ---------- 매물번호 → 이미지 URL 매핑 ---------- */
+        final String bucket = "matddang";
+        final String prefix = "saleimgs/";
+
+        sales.forEach(sale -> {
+            String key = prefix + sale.getSaleId() + ".png";
+            URL url = amazonS3.getUrl(bucket, key);
+            sale.setImgUrl(url.toString());
+        });
+
+        return sales;
     }
 
     public List<SuitableCrops> findBySaleIdInAndCropIdIn(List<Long> saleIds, List<Long> cropIds) {
