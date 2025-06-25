@@ -9,9 +9,8 @@ import java.time.LocalDate;
 @Builder
 public class SaleCompareResponseDto {
 
-    private Long saleId1;
-    private Long saleId2;
-
+    private SaleDetailResponseDto sale1;
+    private SaleDetailResponseDto sale2;
     private LocalDate compareTime;
 
 }
