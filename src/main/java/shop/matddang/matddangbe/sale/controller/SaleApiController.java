@@ -187,10 +187,9 @@ public class SaleApiController {
 
         }else{
             Long userId = Long.parseLong(currentUser.getUsername());
-            saleCompareService.saveCompare(userId, saleId1, saleId2);
-            return ResponseEntity.ok("비교 데이터 저장");
+            SaleCompareResponseDto result = saleCompareService.saveCompare(userId, saleId1, saleId2);
+            return ResponseEntity.ok(result);
         }
-
     }
 
     @Operation(summary = "매물 비교 리스트")
