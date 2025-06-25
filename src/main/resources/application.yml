@@ -25,6 +25,20 @@ spring:
       max-file-size: 10MB
       max-request-size: 800MB
 
+cloud:
+  aws:
+    s3:
+      bucket: matddang
+    folder:
+      folderName1: saleimgs/
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false
+    credentials:
+      accessKey: ${AWS_ACCESS_KEY_ID}
+      secretKey: ${AWS_SECRET_ACCESS_KEY}
+
 logging.level:
   shop.matddang: debug
 

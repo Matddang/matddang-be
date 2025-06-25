@@ -1,5 +1,6 @@
 package shop.matddang.matddangbe.sale.service;
 
+import com.amazonaws.services.s3.AmazonS3;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import shop.matddang.matddangbe.Liked.domain.Liked;
@@ -10,6 +11,7 @@ import shop.matddang.matddangbe.sale.dto.SaleRequestDto;
 import shop.matddang.matddangbe.sale.repository.SaleRepository;
 import shop.matddang.matddangbe.sale.repository.SuitableCropsRepository;
 
+import java.net.URL;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
@@ -22,9 +24,15 @@ public class SaleService {
     private final SaleRepository saleRepository;
     private final SuitableCropsRepository suitableCropsRepository;  // 생성자 주입으로 변경
     private final LikedRepository likedRepository;
+    private final AmazonS3 amazonS3;
 
     public List<Sale> findBySaleId(Long saleId) {
-        return saleRepository.findBySaleId(saleId);
+
+        List<Sale> sale = saleRepository.findBySaleId(saleId);
+        String imageUrl = "https://matddang.s3.ap-northeast-2.amazonaws.com/saleimgs/" + sale.get(0).getSaleId() + ".png";
+        sale.get(0).setImgUrl(imageUrl);
+
+        return sale;
     }
 
     public List<Sale> findBySaleAddrLike(String keyword) {
@@ -42,10 +50,10 @@ public class SaleService {
             throw new IllegalArgumentException("zoom 배열에 4개 값이 필요합니다.");
         }
 
-        double topLat    = zoom.get(0);   // 북쪽(큰 위도)
-        double leftLng   = zoom.get(1);   // 서쪽(작은 경도)
+        double topLat = zoom.get(0);   // 북쪽(큰 위도)
+        double leftLng = zoom.get(1);   // 서쪽(작은 경도)
         double bottomLat = zoom.get(2);   // 남쪽(작은 위도)
-        double rightLng  = zoom.get(3);   // 동쪽(큰 경도)
+        double rightLng = zoom.get(3);   // 동쪽(큰 경도)
 
         // 혹시 값이 뒤바뀌어 들어와도 안전하게
         double minLat = Math.min(topLat, bottomLat);
@@ -70,16 +78,17 @@ public class SaleService {
         // 비었을 경우, 필터가 없을 때 -> 모두
 
         //거래 유형 지정
-        if (requestDto.getSaleCategoryList()==null || requestDto.getSaleCategoryList().isEmpty()) {
-            requestDto.setSaleCategoryList(List.of("임대","매매"));
+        if (requestDto.getSaleCategoryList() == null || requestDto.getSaleCategoryList().isEmpty()) {
+            requestDto.setSaleCategoryList(List.of("임대", "매매"));
         }
 
         //토지 유형 지정
-        if (requestDto.getLandCategoryList()==null || requestDto.getLandCategoryList().isEmpty()) {
+        if (requestDto.getLandCategoryList() == null || requestDto.getLandCategoryList().isEmpty()) {
             requestDto.setLandCategoryList(List.of("전_전", "답_답", "과수원"));
         }
         // ---------------------------------------- 데이터 전처리 완료 ----------------------------------------
-        return saleRepository.searchBySaleFilter(
+        /* ---------- 2) 필터 검색 ---------- */
+        List<Sale> sales = saleRepository.searchBySaleFilter(
                 requestDto.getSaleCategoryList(),
                 requestDto.getMinPrice(),
                 requestDto.getMaxPrice(),
@@ -87,6 +96,18 @@ public class SaleService {
                 requestDto.getMaxArea(),
                 requestDto.getLandCategoryList()
         );
+
+        /* ---------- 매물번호 → 이미지 URL 매핑 ---------- */
+        final String bucket = "matddang";
+        final String prefix = "saleimgs/";
+
+        sales.forEach(sale -> {
+            String key = prefix + sale.getSaleId() + ".png";
+            URL url = amazonS3.getUrl(bucket, key);
+            sale.setImgUrl(url.toString());
+        });
+
+        return sales;
     }
 
     public List<SuitableCrops> findBySaleIdInAndCropIdIn(List<Long> saleIds, List<Long> cropIds) {
@@ -185,8 +206,6 @@ public class SaleService {
 
         saleList.sort(comparator.reversed());  // 좋아요가 있는 매물이 앞에 오게 정렬
     }
-
-
 
 
 }
