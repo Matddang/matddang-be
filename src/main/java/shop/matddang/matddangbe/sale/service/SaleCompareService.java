@@ -42,9 +42,14 @@ public class SaleCompareService {
             saleCompareRepository.save(compare);
 
         }
-        // 3) 두 매물 정보 로드
+
         Optional<Sale> sale1 = saleRepository.findById(saleId1);
         Optional<Sale> sale2 = saleRepository.findById(saleId2);
+
+        // 이미지 설정
+        sale1.ifPresent(s -> s.setImgUrl(buildImgUrl(s.getSaleId())));
+        sale2.ifPresent(s -> s.setImgUrl(buildImgUrl(s.getSaleId())));
+
         SaleDetailResponseDto saleDto1 = new SaleDetailResponseDto(
                 List.of(sale1.get()),
                 List.of()
@@ -79,6 +84,9 @@ public class SaleCompareService {
                     Sale sale1 = saleMap.get(c.getSaleId1());
                     Sale sale2 = saleMap.get(c.getSaleId2());
 
+                    sale1.setImgUrl(buildImgUrl(sale1.getSaleId()));
+                    sale2.setImgUrl(buildImgUrl(sale2.getSaleId()));
+
                     // SaleDetailResponseDto 구성 (유사매물은 없어도 됨)
                     SaleDetailResponseDto dto1 = new SaleDetailResponseDto(
                             List.of(sale1),
@@ -95,5 +103,7 @@ public class SaleCompareService {
 
         return responses;
     }
-
+    private String buildImgUrl(Long saleId) {
+        return "https://matddang.s3.ap-northeast-2.amazonaws.com/saleimgs/" + saleId + ".png";
+    }
 }
