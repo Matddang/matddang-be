@@ -54,6 +54,7 @@ public class SaleService {
                     dto.setLandCategory(s.getLandCategory());
                     dto.setPrice(s.getPrice());
                     dto.setArea(s.getArea());
+                    dto.setMainCrop(s.getMainCrop());
                     dto.setImgUrl("https://matddang.s3.ap-northeast-2.amazonaws.com/saleimgs/" + s.getSaleId() + ".png");
                     return dto;
                 })

@@ -20,6 +20,7 @@ public class SimilarSaleDto {
     private String landCategory;
     private BigDecimal price;
     private BigDecimal area;
+    private String mainCrop;
     private String imgUrl;
 
 }

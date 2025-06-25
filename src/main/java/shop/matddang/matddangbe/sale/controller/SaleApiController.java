@@ -10,13 +10,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
-import shop.matddang.matddangbe.Liked.domain.Liked;
 import shop.matddang.matddangbe.Liked.dto.LikedResponseDto;
 import shop.matddang.matddangbe.Liked.service.LikedService;
 import shop.matddang.matddangbe.sale.domain.Sale;
 import shop.matddang.matddangbe.sale.domain.SearchAddr;
 import shop.matddang.matddangbe.sale.dto.SaleCompareResponseDto;
 import shop.matddang.matddangbe.sale.dto.SaleDetailResponseDto;
+import shop.matddang.matddangbe.sale.dto.SimilarSaleDto;
 import shop.matddang.matddangbe.sale.service.SaleCompareService;
 import shop.matddang.matddangbe.sale.service.SearchAddrService;
 import shop.matddang.matddangbe.suitableCrops.dto.SuitableCropsResponseDto;
@@ -141,7 +141,7 @@ public class SaleApiController {
         }
 
         Long userId = Long.parseLong(currentUser.getUsername());
-        List<Liked> likedSaleList = likedService.getLikedSaleList(userId);
+        List<SimilarSaleDto> likedSaleList = likedService.getLikedSaleList(userId);
         return ResponseEntity.ok(likedSaleList);
 
     }
