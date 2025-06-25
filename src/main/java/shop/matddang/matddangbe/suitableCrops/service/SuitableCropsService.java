@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import shop.matddang.matddangbe.crop.domain.Crop;
 import shop.matddang.matddangbe.crop.service.CropService;
 import shop.matddang.matddangbe.sale.domain.Sale;
+import shop.matddang.matddangbe.sale.dto.SaleDetailResponseDto;
 import shop.matddang.matddangbe.sale.repository.SaleRepository;
 import shop.matddang.matddangbe.sale.repository.SuitableCropsRepository;
 import shop.matddang.matddangbe.sale.service.SaleService;
@@ -29,8 +30,8 @@ public class SuitableCropsService {
     }
 
     public List<SuitableCropsResponseDto> getRecommendedCrops(Long saleId) {
-        List<Sale> saleList = saleService.findBySaleId(saleId); //거래유형, 가격, 면적, 토지유형 필터링 완료
-        BigDecimal area = saleList.get(0).getArea(); // saleId에 대한 면적
+        SaleDetailResponseDto saleList = saleService.findBySaleId(saleId); //거래유형, 가격, 면적, 토지유형 필터링 완료
+        BigDecimal area = saleList.getSale().get(0).getArea() ; // saleId에 대한 면적
 
         Set<SuitableCrops> suitableCropsList = findAllBySaleId(saleId);
 

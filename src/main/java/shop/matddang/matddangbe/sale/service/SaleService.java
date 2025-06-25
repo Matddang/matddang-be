@@ -6,15 +6,15 @@ import org.springframework.stereotype.Service;
 import shop.matddang.matddangbe.Liked.domain.Liked;
 import shop.matddang.matddangbe.Liked.repository.LikedRepository;
 import shop.matddang.matddangbe.sale.domain.Sale;
+import shop.matddang.matddangbe.sale.dto.SaleDetailResponseDto;
+import shop.matddang.matddangbe.sale.dto.SimilarSaleDto;
 import shop.matddang.matddangbe.suitableCrops.domain.SuitableCrops;
 import shop.matddang.matddangbe.sale.dto.SaleRequestDto;
 import shop.matddang.matddangbe.sale.repository.SaleRepository;
 import shop.matddang.matddangbe.sale.repository.SuitableCropsRepository;
 
 import java.net.URL;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -25,14 +25,46 @@ public class SaleService {
     private final SuitableCropsRepository suitableCropsRepository;  // 생성자 주입으로 변경
     private final LikedRepository likedRepository;
     private final AmazonS3 amazonS3;
+    public SaleDetailResponseDto findBySaleId(Long saleId) {
 
-    public List<Sale> findBySaleId(Long saleId) {
+        // 1. 현재 매물 조회 및 이미지 URL 세팅
+        List<Sale> saleList = saleRepository.findBySaleId(saleId);
+        Sale sale = saleList.get(0);
+        sale.setImgUrl("https://matddang.s3.ap-northeast-2.amazonaws.com/saleimgs/" + sale.getSaleId() + ".png");
 
-        List<Sale> sale = saleRepository.findBySaleId(saleId);
-        String imageUrl = "https://matddang.s3.ap-northeast-2.amazonaws.com/saleimgs/" + sale.get(0).getSaleId() + ".png";
-        sale.get(0).setImgUrl(imageUrl);
+        // 2. 유사 매물 ID 무작위 추출 (자기 자신 제외)
+        List<Long> allIds = new ArrayList<>();
+        for (long i = 1; i <= 257; i++) {
+            if (i != saleId) allIds.add(i);
+        }
+        Collections.shuffle(allIds);
+        List<Long> randomIds = allIds.stream().limit(5).collect(Collectors.toList());
 
-        return sale;
+        // 3. 유사 매물 조회
+        List<Sale> similarSalesEntity = saleRepository.findBySaleIdIn(randomIds);
+
+        // 4. DTO 변환
+        List<SimilarSaleDto> similarSales = similarSalesEntity.stream()
+                .map(s -> {
+                    SimilarSaleDto dto = new SimilarSaleDto();
+                    dto.setSaleId(s.getSaleId());
+                    dto.setSaleCategory(s.getSaleCategory());
+                    dto.setLandType(s.getLandType());
+                    dto.setSaleAddr(s.getSaleAddr());
+                    dto.setLandCategory(s.getLandCategory());
+                    dto.setPrice(s.getPrice());
+                    dto.setArea(s.getArea());
+                    dto.setImgUrl("https://matddang.s3.ap-northeast-2.amazonaws.com/saleimgs/" + s.getSaleId() + ".png");
+                    return dto;
+                })
+                .collect(Collectors.toList());
+
+
+        SaleDetailResponseDto responseDto = new SaleDetailResponseDto();
+        responseDto.setSale(List.of(sale));
+        responseDto.setSimilarSales(similarSales);
+
+        return responseDto;
     }
 
     public List<Sale> findBySaleAddrLike(String keyword) {

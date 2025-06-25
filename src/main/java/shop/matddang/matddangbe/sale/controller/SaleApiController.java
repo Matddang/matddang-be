@@ -16,6 +16,7 @@ import shop.matddang.matddangbe.Liked.service.LikedService;
 import shop.matddang.matddangbe.sale.domain.Sale;
 import shop.matddang.matddangbe.sale.domain.SearchAddr;
 import shop.matddang.matddangbe.sale.dto.SaleCompareResponseDto;
+import shop.matddang.matddangbe.sale.dto.SaleDetailResponseDto;
 import shop.matddang.matddangbe.sale.service.SaleCompareService;
 import shop.matddang.matddangbe.sale.service.SearchAddrService;
 import shop.matddang.matddangbe.suitableCrops.dto.SuitableCropsResponseDto;
@@ -123,9 +124,9 @@ public class SaleApiController {
     @Operation(summary = "매물 ID별 상세 정보",
             description = "매물 ID별 상세 정보")
     @GetMapping("/{saleId}")
-    public ResponseEntity<List<Sale>> getSalesDetail(@PathVariable("saleId") Long saleId) {
+    public ResponseEntity<SaleDetailResponseDto> getSalesDetail(@PathVariable("saleId") Long saleId) {
 
-        List<Sale> saleList = saleService.findBySaleId(saleId);
+        SaleDetailResponseDto saleList = saleService.findBySaleId(saleId);
         return ResponseEntity.ok(saleList);
 
     }

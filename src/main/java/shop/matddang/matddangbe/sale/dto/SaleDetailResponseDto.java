@@ -1,22 +1,19 @@
 package shop.matddang.matddangbe.sale.dto;
 
-import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 import shop.matddang.matddangbe.sale.domain.Sale;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 
-@Getter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class SaleResponseDto {
+public class SaleDetailResponseDto {
 
-    //Todo 나중에 개발 예정
+
     private List<Sale> sale; // sale 정보
-    private String imageUrl; // 이미지 URL
+    private List<SimilarSaleDto> similarSales ; //비슷한 매물 리스트
 
 }
