@@ -15,6 +15,11 @@ public record PlaceUpdateRequest(
         @NotBlank
         String placeName,
         @NotBlank
-        String address
+        String address,
+        @NotNull
+        Double latitude,
+        @NotNull
+        Double longitude
+
 ) {
 }

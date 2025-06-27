@@ -6,6 +6,8 @@ public record PlaceResponse(
         Long placeId,
         PlaceType placeType,
         String placeName,
-        String address
+        String address,
+        Double latitude,
+        Double longitude
 ) {
 }
