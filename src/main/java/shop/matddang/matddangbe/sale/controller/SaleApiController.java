@@ -137,9 +137,16 @@ public class SaleApiController {
     @Operation(summary = "매물 ID별 상세 정보",
             description = "매물 ID별 상세 정보")
     @GetMapping("/{saleId}")
-    public ResponseEntity<SaleDetailResponseDto> getSalesDetail(@PathVariable("saleId") Long saleId) {
+    public ResponseEntity<SaleDetailResponseDto> getSalesDetail(@PathVariable("saleId") Long saleId, @AuthenticationPrincipal User currentUser) {
 
         SaleDetailResponseDto saleList = saleService.findBySaleId(saleId);
+        if (currentUser != null) {
+            Long userId = Long.parseLong(currentUser.getUsername());
+            saleList = saleService.setIsLiked(saleId, userId);
+        }else{
+            saleList.getSale().get(0).setIsLiked(false);
+        }
+
         return ResponseEntity.ok(saleList);
 
     }

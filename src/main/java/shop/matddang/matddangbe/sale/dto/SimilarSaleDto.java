@@ -22,5 +22,6 @@ public class SimilarSaleDto {
     private BigDecimal area;
     private String mainCrop;
     private String imgUrl;
+    private Boolean isLiked = false;
 
 }
