@@ -13,11 +13,11 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Sale{
+public class Sale {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="sale_id")
+    @Column(name = "sale_id")
     private Long saleId;
 
     @Column(name = "sale_category")
@@ -58,5 +58,8 @@ public class Sale{
 
     @Column(name = "img_url")
     private String imgUrl;
+
+    private Boolean isLiked = false;
+
 
 }

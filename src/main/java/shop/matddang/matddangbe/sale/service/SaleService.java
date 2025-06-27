@@ -241,4 +241,27 @@ public class SaleService {
     }
 
 
+    public SaleDetailResponseDto setIsLiked(Long saleId, Long userId) {
+        SaleDetailResponseDto dto = findBySaleId(saleId);
+
+        if (userId == null) {
+            return dto;
+        }
+
+        List<Long> targetIds = dto.getSimilarSales().stream()
+                .map(SimilarSaleDto::getSaleId)
+                .collect(Collectors.toList());
+        targetIds.add(saleId);
+
+        // 좋아요 누른 매물 ID 한 방에 조회
+        List<Long> likedIds = likedRepository
+                .findLikedSaleIdsByUserIdAndSaleIds(userId, targetIds);
+
+        dto.getSale().get(0).setIsLiked(likedIds.contains(saleId));
+
+        dto.getSimilarSales().forEach(sim ->
+                sim.setIsLiked(likedIds.contains(sim.getSaleId())));
+
+        return dto;
+    }
 }
