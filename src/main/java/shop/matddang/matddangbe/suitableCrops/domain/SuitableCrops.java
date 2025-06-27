@@ -4,7 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "suitableCrops")
+@Table(name = "suitable_crops")
+@IdClass(SuitableCropsId.class)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -12,11 +13,11 @@ import lombok.*;
 public class SuitableCrops {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="crop_id")
-    private Long cropId;
-
-    @Column(name="sale_id")
+    @Column(name = "sale_id")
     private Long saleId;
+
+    @Id
+    @Column(name = "crop_id")
+    private Long cropId;
 
 }
