@@ -29,6 +29,8 @@ public class MyPlace {
 
     private String address;
 
+    private Double latitude;   // 위도
+    private Double longitude;  // 경도
 
     public static MyPlace of(UserEntity user, PlaceUpdateRequest placeUpdateRequest) {
         return MyPlace.builder()
@@ -36,21 +38,26 @@ public class MyPlace {
                 .placeType(placeUpdateRequest.placeType())
                 .placeName(placeUpdateRequest.placeName())
                 .address(placeUpdateRequest.address())
+                .latitude(placeUpdateRequest.latitude())
+                .longitude(placeUpdateRequest.longitude())
                 .build();
     }
 
     @Builder
-    public MyPlace(UserEntity user, PlaceType placeType, String placeName, String address) {
+    public MyPlace(UserEntity user, PlaceType placeType, String placeName, String address, Double latitude, Double longitude) {
         this.user = user;
         this.placeType = placeType;
         this.placeName = placeName;
         this.address = address;
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
-
 
     public void update(PlaceUpdateRequest placeUpdateRequest) {
         this.placeType = placeUpdateRequest.placeType();
         this.placeName = placeUpdateRequest.placeName();
         this.address = placeUpdateRequest.address();
+        this.latitude = placeUpdateRequest.latitude();
+        this.longitude = placeUpdateRequest.longitude();
     }
 }
