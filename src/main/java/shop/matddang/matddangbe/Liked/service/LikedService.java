@@ -54,6 +54,10 @@ public class LikedService {
         return similarSales;
     }
 
+    public boolean userLiked(Long saleId, Long userId) {
+        Optional<Liked> existing = likedRepository.findByUserIdAndSaleId(userId, saleId);
+        return existing.isPresent();
+    }
 
     public LikedResponseDto toggleSaleLike(Long saleId, Long userId) {
         if (userId == null) {

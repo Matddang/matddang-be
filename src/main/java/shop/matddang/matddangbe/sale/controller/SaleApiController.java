@@ -25,6 +25,7 @@ import shop.matddang.matddangbe.sale.dto.SaleRequestDto;
 import shop.matddang.matddangbe.sale.service.SaleService;
 import shop.matddang.matddangbe.suitableCrops.service.SuitableCropsService;
 import org.springframework.data.domain.PageRequest;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -44,12 +45,24 @@ public class SaleApiController {
     @Operation(summary = "매물 조회 & 검색",
             description = "매물 조회 & 검색 & 필터링")
     @PostMapping
-    public ResponseEntity<?> getSales(@RequestBody SaleRequestDto requestDto) {
+    public ResponseEntity<?> getSales(@RequestBody SaleRequestDto requestDto, @AuthenticationPrincipal User currentUser) {
 
         List<Sale> saleList = saleService.searchSales(requestDto);
 
+        // 좋아요 여부 전달
+        if (currentUser != null) {
+
+            Long userId = Long.parseLong(currentUser.getUsername());
+
+            for (Sale sale : saleList) {
+                boolean isLiked = likedService.userLiked(sale.getSaleId(), userId);
+                sale.setIsLiked(isLiked);
+            }
+
+        }
+
         // 농작물 필터링
-        if (requestDto.getCropIds()!=null && !requestDto.getCropIds().isEmpty()) {
+        if (requestDto.getCropIds() != null && !requestDto.getCropIds().isEmpty()) {
 
             List<Long> saleIds = saleList.stream()
                     .map(Sale::getSaleId)
@@ -67,26 +80,26 @@ public class SaleApiController {
         }
 
 
-        if ( requestDto.getLocation() != null && !requestDto.getLocation().isEmpty()){
+        if (requestDto.getLocation() != null && !requestDto.getLocation().isEmpty()) {
             // 지정 장소 기반 거리 정렬 필터
-            saleList = saleService.getsearchSalesByLocation(requestDto.getLocation(),saleList); //거래유형, 가격, 면적, 토지유형 필터링 완료
+            saleList = saleService.getsearchSalesByLocation(requestDto.getLocation(), saleList); //거래유형, 가격, 면적, 토지유형 필터링 완료
         }
 
 
-        if(requestDto.getKeyword()!=null && !requestDto.getKeyword().isEmpty()){ //검색한다면
+        if (requestDto.getKeyword() != null && !requestDto.getKeyword().isEmpty()) { //검색한다면
             saleList = saleService.findBySaleAddrLike(requestDto.getKeyword());
         }
 
-        if(requestDto.getZoom()!=null && !requestDto.getZoom().isEmpty()){
+        if (requestDto.getZoom() != null && !requestDto.getZoom().isEmpty()) {
             // 지도에서 반경 내의 매물만
-            saleList = saleService.findNearBy(saleList,requestDto.getZoom());
+            saleList = saleService.findNearBy(saleList, requestDto.getZoom());
         }
 
 
-        if(requestDto.getSortBy()==null || requestDto.getSortBy().isEmpty()){
+        if (requestDto.getSortBy() == null || requestDto.getSortBy().isEmpty()) {
             requestDto.setSortBy("profit"); // 수익형 추천으로 기본값 설정
         }
-        
+
         // 정렬
         if (requestDto.getSortBy() != null && !requestDto.getSortBy().isEmpty()) {
             saleService.getSortSales(saleList, requestDto.getSortBy());
@@ -170,7 +183,7 @@ public class SaleApiController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body("로그인된 사용자만 접근할 수 있습니다.");
 
-        }else{
+        } else {
             Long userId = Long.parseLong(currentUser.getUsername());
             List<SearchAddr> searchAddrList = searchAddrService.getKeywordList(userId);
             return ResponseEntity.ok(searchAddrList);
@@ -180,12 +193,12 @@ public class SaleApiController {
 
     @Operation(summary = "매물 비교 - 비교한 기록 저장")
     @GetMapping("/compare/{saleId1}/{saleId2}")
-    public ResponseEntity<Object> setCompareData(@AuthenticationPrincipal User currentUser, @PathVariable("saleId1") Long saleId1 , @PathVariable("saleId2") Long saleId2) {
+    public ResponseEntity<Object> setCompareData(@AuthenticationPrincipal User currentUser, @PathVariable("saleId1") Long saleId1, @PathVariable("saleId2") Long saleId2) {
         if (currentUser == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body("로그인된 사용자만 접근할 수 있습니다.");
 
-        }else{
+        } else {
             Long userId = Long.parseLong(currentUser.getUsername());
             SaleCompareResponseDto result = saleCompareService.saveCompare(userId, saleId1, saleId2);
             return ResponseEntity.ok(result);
@@ -199,7 +212,7 @@ public class SaleApiController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body("로그인된 사용자만 접근할 수 있습니다.");
 
-        }else{
+        } else {
             Long userId = Long.parseLong(currentUser.getUsername());
             List<SaleCompareResponseDto> comparelist = saleCompareService.getCompareHistory(userId);
             return ResponseEntity.ok(comparelist);
