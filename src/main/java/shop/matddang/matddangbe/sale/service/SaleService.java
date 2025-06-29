@@ -152,14 +152,6 @@ public class SaleService {
         return saleRepository.save(sale);
     }
 
-    //거리 기반 정렬
-    public List<Sale> getsearchSalesByLocation(List<Double> location, List<Sale> saleList) {
-        return saleList.stream()
-                .sorted(Comparator.comparingDouble(sale ->
-                        calculateDistance(location.get(0), location.get(1), sale.getWgsY(), sale.getWgsX())
-                ))
-                .collect(Collectors.toList());
-    }
 
     //거리 계산
     private double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
@@ -177,45 +169,53 @@ public class SaleService {
         return EARTH_RADIUS_KM * c; // 단위: km
     }
 
-    public void getSortSales(List<Sale> saleList, String sortBy) {
-        if (sortBy == null || saleList == null || saleList.isEmpty()) return;
+    public List<Sale> getSortSales(List<Sale> saleList,
+                                   List<Double> location,
+                                   String sortBy) {
 
-        Comparator<Sale> comparator = null;
+        if (saleList == null || saleList.isEmpty()) return saleList;
+
+//       5km 단위로 반올림 ⇒ 같은 버킷이면 동점 */
+        Comparator<Sale> distanceBucket = Comparator.comparingLong(sale -> {
+            if (location != null && location.size() >= 2) {
+                double dist = calculateDistance(location.get(0), location.get(1),
+                        sale.getWgsX(), sale.getWgsY());
+                return Math.round(dist / 5);   // 5km지정
+            }
+            return 0L;
+        });
+
+        Set<Long> likedSaleIds = likedRepository
+                .findBySaleIdIn(
+                        saleList.stream().map(Sale::getSaleId).toList()
+                )
+                .stream()
+                .map(Liked::getSaleId)
+                .collect(Collectors.toSet());
+
+        Comparator<Sale> comp = distanceBucket;
 
         switch (sortBy) {
-            case "profit":
-                comparator = Comparator.comparing(Sale::getProfit);
-                break;
-            case "liked":
-                getSortSalesByLiked(saleList); // liked는 별도 정렬 메서드
-                return;
-            case "both":
-                comparator = Comparator.comparing(Sale::getProfit);
-
-                List<Long> saleIds = saleList.stream()
-                        .map(Sale::getSaleId)
-                        .collect(Collectors.toList());
-
-                Set<Long> likedSaleIds = likedRepository.findBySaleIdIn(saleIds)
-                        .stream()
-                        .map(Liked::getSaleId)
-                        .collect(Collectors.toSet());
-
-                Comparator<Sale> likedComparator = Comparator.comparing(
-                        sale -> likedSaleIds.contains(sale.getSaleId()) // 좋아요가 있으면 앞에, 없으면 뒤에
-                );
-
-                // 수익 기준 정렬 후 liked 기준 정렬
-                comparator = comparator.thenComparing(likedComparator);
-                break;
-            default:
-                return;
+            case "profit" -> comp = comp.thenComparing(
+                    Comparator.comparing(Sale::getProfit).reversed()
+            );
+            case "liked" -> comp = comp.thenComparing(
+                    Comparator.comparing(
+                            (Sale s) -> likedSaleIds.contains(s.getSaleId()) ? 1 : 0
+                    ).reversed()
+            );
+            case "both" -> comp = comp
+                    .thenComparing(Comparator.comparing(Sale::getProfit).reversed())
+                    .thenComparing(
+                            Comparator.comparing(
+                                    (Sale s) -> likedSaleIds.contains(s.getSaleId()) ? 1 : 0
+                            ).reversed()
+                    );
         }
 
-        if (comparator != null) {
-            comparator = comparator.reversed(); // desc
-            saleList.sort(comparator); // 리스트 정렬
-        }
+        return saleList.stream()
+                .sorted(comp)
+                .toList();
     }
 
 
